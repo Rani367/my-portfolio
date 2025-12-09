@@ -72,6 +72,96 @@ body {
 }
 
 /* ============================================
+   APPLE STARTUP SCREEN
+   ============================================ */
+
+#startup-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    transition: opacity 0.5s ease-out;
+}
+
+#startup-screen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.startup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 50px;
+}
+
+.startup-logo {
+    width: 80px;
+    height: 80px;
+    opacity: 0;
+    animation: logoFadeIn 0.8s ease-out 0.3s forwards;
+}
+
+@keyframes logoFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.startup-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    opacity: 0;
+    animation: progressFadeIn 0.5s ease-out 0.8s forwards;
+}
+
+@keyframes progressFadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.startup-progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #fff;
+    border-radius: 2px;
+    animation: progressFill 2s ease-in-out 1s forwards;
+}
+
+@keyframes progressFill {
+    0% {
+        width: 0%;
+    }
+    20% {
+        width: 25%;
+    }
+    50% {
+        width: 60%;
+    }
+    80% {
+        width: 85%;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+/* ============================================
    LIQUID GLASS FOUNDATION STYLES
    ============================================ */
 

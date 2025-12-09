@@ -510,6 +510,19 @@ function showWelcomeNotification() {
 
 // Initialize the application
 document.addEventListener("DOMContentLoaded", () => {
+  // Handle startup screen
+  const startupScreen = document.getElementById("startup-screen");
+
+  // Wait for startup animation to complete (3s total: 1s delay + 2s progress)
+  setTimeout(() => {
+    startupScreen.classList.add("fade-out");
+
+    // Remove from DOM after fade
+    setTimeout(() => {
+      startupScreen.remove();
+    }, 500);
+  }, 3000);
+
   desktop.classList.add("loaded");
 
   initializeDock();
