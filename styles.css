@@ -1080,6 +1080,7 @@ body {
     font-weight: 700;
     color: rgba(0, 0, 0, 0.6);
     line-height: 1;
+    margin-top: -2px;
 }
 
 .window.focused .window-controls:hover .control.minimize::before {
@@ -1097,6 +1098,7 @@ body {
     font-weight: 700;
     color: rgba(0, 0, 0, 0.6);
     line-height: 1;
+    margin-top: -2px;
 }
 
 .window-title {
