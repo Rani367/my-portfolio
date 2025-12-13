@@ -1,0 +1,6 @@
+# robots.txt for Rani Malach Portfolio
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://rani-malach.vercel.app/sitemap.xml
