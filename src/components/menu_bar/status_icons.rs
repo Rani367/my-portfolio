@@ -4,16 +4,31 @@
 //! detailed information when clicked.
 
 use leptos::prelude::*;
-use crate::hooks::use_battery;
+use crate::hooks::{use_battery, use_network};
 
 /// WiFi icon with tooltip showing connection info.
 #[component]
 pub fn WifiIcon() -> impl IntoView {
+    let network_status = use_network();
     let (show_tooltip, set_show_tooltip) = signal(false);
 
     let toggle_tooltip = move |_: web_sys::MouseEvent| {
         set_show_tooltip.update(|v| *v = !*v);
     };
+
+    let connection_status = move || network_status.get().status_display();
+    let connection_type = move || network_status.get().type_display();
+    let effective_type = move || {
+        let status = network_status.get();
+        match status.effective_type.as_str() {
+            "4g" => "Excellent",
+            "3g" => "Good",
+            "2g" => "Fair",
+            "slow-2g" => "Poor",
+            _ => "Good",
+        }
+    };
+    let is_online = move || network_status.get().online;
 
     view! {
         <div
@@ -24,6 +39,7 @@ pub fn WifiIcon() -> impl IntoView {
                 src="/public/icons/wifi.svg"
                 alt="WiFi"
                 class="menu-icon"
+                style:opacity=move || if is_online() { "1" } else { "0.4" }
             />
             <div class=move || {
                 if show_tooltip.get() {
@@ -34,15 +50,15 @@ pub fn WifiIcon() -> impl IntoView {
             }>
                 <div class="status-row">
                     <span class="status-label">"Wi-Fi"</span>
-                    <span class="status-value">"Connected"</span>
+                    <span class="status-value">{connection_status}</span>
                 </div>
                 <div class="status-row">
-                    <span class="status-label">"Network"</span>
-                    <span class="status-value">"Portfolio_5G"</span>
+                    <span class="status-label">"Connection"</span>
+                    <span class="status-value">{connection_type}</span>
                 </div>
                 <div class="status-row">
-                    <span class="status-label">"IP Address"</span>
-                    <span class="status-value">"192.168.1.42"</span>
+                    <span class="status-label">"Signal"</span>
+                    <span class="status-value">{effective_type}</span>
                 </div>
             </div>
         </div>
@@ -59,6 +75,7 @@ pub fn BatteryIcon() -> impl IntoView {
         set_show_tooltip.update(|v| *v = !*v);
     };
 
+    let is_supported = move || battery_status.get().supported;
     let battery_percentage = move || battery_status.get().percentage();
     let battery_display = move || battery_status.get().display();
     let is_charging = move || battery_status.get().charging;
@@ -99,6 +116,7 @@ pub fn BatteryIcon() -> impl IntoView {
                 src="/public/icons/battery.svg"
                 alt="Battery"
                 class="menu-icon"
+                style:opacity=move || if is_supported() { "1" } else { "0.5" }
             />
             <div class=move || {
                 if show_tooltip.get() {
@@ -107,26 +125,40 @@ pub fn BatteryIcon() -> impl IntoView {
                     "status-tooltip"
                 }
             }>
-                <div class="status-row">
-                    <span class="status-label">"Battery"</span>
-                    <div class="status-battery">
-                        <div class="battery-icon">
-                            <div
-                                class="battery-level"
-                                style:width=battery_width
-                            ></div>
+                {move || if is_supported() {
+                    view! {
+                        <div class="status-row">
+                            <span class="status-label">"Battery"</span>
+                            <div class="status-battery">
+                                <div class="battery-icon">
+                                    <div
+                                        class="battery-level"
+                                        style:width=battery_width
+                                    ></div>
+                                </div>
+                                <span class="status-value">{battery_display}</span>
+                            </div>
                         </div>
-                        <span class="status-value">{battery_display}</span>
-                    </div>
-                </div>
-                <div class="status-row">
-                    <span class="status-label">"Power Source"</span>
-                    <span class="status-value">{power_source}</span>
-                </div>
-                <div class="status-row">
-                    <span class="status-label">"Time Remaining"</span>
-                    <span class="status-value">{time_remaining}</span>
-                </div>
+                        <div class="status-row">
+                            <span class="status-label">"Power Source"</span>
+                            <span class="status-value">{power_source}</span>
+                        </div>
+                        <div class="status-row">
+                            <span class="status-label">"Time Remaining"</span>
+                            <span class="status-value">{time_remaining}</span>
+                        </div>
+                    }.into_any()
+                } else {
+                    view! {
+                        <div class="status-row">
+                            <span class="status-label">"Battery"</span>
+                            <span class="status-value">"Not available"</span>
+                        </div>
+                        <div class="status-row" style="opacity: 0.6; font-size: 11px;">
+                            <span>"Battery API not supported in this browser (Firefox disabled it for privacy)"</span>
+                        </div>
+                    }.into_any()
+                }}
             </div>
         </div>
     }

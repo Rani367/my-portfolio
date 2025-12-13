@@ -8,6 +8,7 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::window;
 use js_sys::{Object, Reflect, Promise};
+use std::rc::Rc;
 
 /// Battery status information.
 #[derive(Clone, Debug, PartialEq)]
@@ -20,6 +21,8 @@ pub struct BatteryStatus {
     pub charging_time: Option<f64>,
     /// Time in seconds until the battery is fully discharged (if discharging).
     pub discharging_time: Option<f64>,
+    /// Whether the Battery API is supported.
+    pub supported: bool,
 }
 
 impl Default for BatteryStatus {
@@ -29,6 +32,7 @@ impl Default for BatteryStatus {
             charging: true,
             charging_time: None,
             discharging_time: None,
+            supported: false,
         }
     }
 }
@@ -41,6 +45,9 @@ impl BatteryStatus {
 
     /// Get a display string for the battery status.
     pub fn display(&self) -> String {
+        if !self.supported {
+            return "Not available".to_string();
+        }
         let percent = self.percentage();
         if self.charging {
             format!("{}% (Charging)", percent)
@@ -54,17 +61,56 @@ impl BatteryStatus {
 ///
 /// Uses the Web Battery API to get real-time battery information.
 /// Falls back to default values if the API is not available.
+/// Sets up event listeners to update when battery status changes.
 ///
 /// # Returns
-/// A  that updates when battery status changes.
+/// A signal that updates when battery status changes.
 pub fn use_battery() -> RwSignal<BatteryStatus> {
     let battery_status = RwSignal::new(BatteryStatus::default());
 
-    // Spawn async task to get battery info
+    // Spawn async task to get battery info and set up listeners
     Effect::new(move |_| {
         wasm_bindgen_futures::spawn_local(async move {
-            if let Some(status) = get_battery_status().await {
-                battery_status.set(status);
+            if let Some(battery_manager) = get_battery_manager().await {
+                // Get initial status
+                if let Some(status) = extract_battery_status(&battery_manager) {
+                    battery_status.set(status);
+                }
+
+                // Set up event listeners for real-time updates
+                let update_status = {
+                    let battery_manager = battery_manager.clone();
+                    Closure::wrap(Box::new(move || {
+                        if let Some(status) = extract_battery_status(&battery_manager) {
+                            battery_status.set(status);
+                        }
+                    }) as Box<dyn Fn()>)
+                };
+
+                // Add event listeners
+                let _ = Reflect::set(
+                    &battery_manager,
+                    &"onlevelchange".into(),
+                    update_status.as_ref(),
+                );
+                let _ = Reflect::set(
+                    &battery_manager,
+                    &"onchargingchange".into(),
+                    update_status.as_ref(),
+                );
+                let _ = Reflect::set(
+                    &battery_manager,
+                    &"onchargingtimechange".into(),
+                    update_status.as_ref(),
+                );
+                let _ = Reflect::set(
+                    &battery_manager,
+                    &"ondischargingtimechange".into(),
+                    update_status.as_ref(),
+                );
+
+                // Leak the closure to keep it alive
+                update_status.forget();
             }
         });
     });
@@ -72,15 +118,14 @@ pub fn use_battery() -> RwSignal<BatteryStatus> {
     battery_status
 }
 
-/// Get battery status from the Web Battery API.
-async fn get_battery_status() -> Option<BatteryStatus> {
+/// Get the battery manager object from the Web Battery API.
+async fn get_battery_manager() -> Option<Rc<Object>> {
     let win = window()?;
     let navigator = win.navigator();
 
     // Try to get the battery manager
-    // Note: getBattery() is not in web-sys, so we use js_sys to call it
     let get_battery = Reflect::get(&navigator, &"getBattery".into()).ok()?;
-    
+
     if get_battery.is_undefined() || get_battery.is_null() {
         return None;
     }
@@ -92,9 +137,13 @@ async fn get_battery_status() -> Option<BatteryStatus> {
 
     // Await the promise
     let battery_manager = JsFuture::from(promise).await.ok()?;
-    let battery_obj = battery_manager.dyn_ref::<Object>()?;
+    let battery_obj = battery_manager.dyn_into::<Object>().ok()?;
 
-    // Extract battery properties
+    Some(Rc::new(battery_obj))
+}
+
+/// Extract battery status from a battery manager object.
+fn extract_battery_status(battery_obj: &Object) -> Option<BatteryStatus> {
     let level = Reflect::get(battery_obj, &"level".into())
         .ok()?
         .as_f64()
@@ -120,5 +169,6 @@ async fn get_battery_status() -> Option<BatteryStatus> {
         charging,
         charging_time,
         discharging_time,
+        supported: true,
     })
 }

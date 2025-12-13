@@ -87,7 +87,7 @@ fn FileGrid(
             items.get().iter().map(|item| {
                 let nav_state = nav_state.clone();
                 let app_state = app_state.clone();
-                let on_dblclick = move |_| {
+                let on_click = move |_| {
                     match item.kind {
                         ItemKind::Folder => {
                             nav_state.navigate_into_folder(item.id);
@@ -139,7 +139,7 @@ fn FileGrid(
                     <div
                         class=class_name
                         style=item_style
-                        on:dblclick=on_dblclick
+                        on:click=on_click
                     >
                         <img src=item.icon alt="" class="file-item-icon" />
                         <span class="file-item-name">{item.name}</span>
