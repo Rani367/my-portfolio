@@ -124,6 +124,7 @@ Output in `dist/` directory.
 
 ## Constraints
 
+- **NEVER commit on behalf of the user** - Stage changes and build, but let the user commit themselves
 - Maintain macOS-like UX patterns (window management, dock behavior, finder navigation)
 - CSS class names must match `styles.css` exactly for styling to work
 - **Performance**: Use signals efficiently, avoid unnecessary re-renders
