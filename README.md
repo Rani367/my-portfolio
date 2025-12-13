@@ -1,6 +1,12 @@
 # Portfolio
 
-this project was built with 100% Rust, the best programming language.
+This project was built with 100% Rust, the best programming language.
+
+## Tech Stack
+
+- **Rust** + **Leptos 0.8** (reactive web framework)
+- **WebAssembly** (compilation target)
+- **Trunk** (build tool)
 
 ## Development
 
@@ -8,8 +14,13 @@ this project was built with 100% Rust, the best programming language.
 trunk serve
 ```
 
-## Build
+## Build & Deploy
 
 ```bash
 trunk build --release
+git add .
+git commit -m "Build"
+git push
 ```
+
+Vercel serves the pre-built `dist/` folder.
