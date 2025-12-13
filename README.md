@@ -1,6 +1,6 @@
 # Portfolio
 
-This project was built with 100% Rust, the best programming language.
+> **100% Rust** — Zero JavaScript. Pure Rust compiled to WebAssembly.
 
 ## Tech Stack
 

@@ -42,7 +42,7 @@ src/
 │   ├── window_state.rs # WindowId enum, window configurations
 │   ├── navigation_state.rs # Finder navigation
 │   └── notification_state.rs # Notification system
-├── hooks/              # Custom hooks (window dragging, keyboard)
+├── hooks/              # Custom hooks (dragging, keyboard, clock, battery, animation)
 └── components/         # UI components
     ├── windows/        # Window component + content components
     │   ├── window.rs   # Base Window component
@@ -61,6 +61,18 @@ src/
     ├── startup/        # Startup screen animation
     └── notifications/  # Notification center
 ```
+
+### State Architecture
+- **Context-based**: State provided via `provide_context()` at app root, consumed via `use_app_state()`, `use_navigation_state()`, `use_notification_state()`
+- **RwSignal-based**: All reactive state uses `RwSignal<T>` for read/write access
+- **Window management**: `AppState.windows` is a `HashMap<WindowId, WindowState>` - all windows pre-registered, open/close toggles visibility
+- **Z-index management**: `AppState.next_z_index()` ensures focused window is always on top
+
+### Virtual File System
+- Static data in `src/data/locations.rs` defines `LOCATIONS` array with nested `FileItem` children
+- `FileItem` can be folders (with children) or files (with `FileType`: Txt, Img, Url, Pdf, Fig)
+- Finder navigation uses `NavigationState` with path stack for back/forward
+- Opening files routes to appropriate viewer via `AppState.open_txt_file()` or `AppState.open_img_file()`
 
 ### Styling
 - `styles.css` - All CSS including liquid glass effects, 3D animations
@@ -84,7 +96,7 @@ cargo install trunk
 ```bash
 trunk serve
 ```
-Opens at `http://localhost:8080` with hot reload.
+Opens at `http://localhost:3000` with hot reload (auto-opens browser).
 
 ### Build for Production
 ```bash
@@ -96,6 +108,20 @@ Output in `dist/` directory.
 - `Trunk.toml` - Trunk build configuration
 - `Cargo.toml` - Rust dependencies
 - `src/components/startup/startup.rs` - Set `STARTUP_SCREEN_ENABLED = false` for development
+
+## Common Patterns
+
+### Adding a New Window
+1. Add variant to `WindowId` enum in `src/state/window_state.rs`
+2. Add to `WindowId::all()` and `WindowId::as_str()` methods
+3. Create content component in `src/components/windows/`
+4. Export from `src/components/mod.rs`
+5. Add `<Window>` declaration in `src/lib.rs` with content component as child
+6. Optionally add to dock in `src/data/dock.rs` and update `WindowId::from_dock_id()`
+
+### Adding New Files to Finder
+1. Add `FileItem` entry to appropriate location in `src/data/locations.rs`
+2. For new file types, ensure corresponding viewer window exists
 
 ## Constraints
 
