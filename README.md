@@ -1,1 +1,13 @@
-this project is a macos replica portfolio using pure html javascript and css. no external libraries or frameworks.
+# Portfolio
+
+## Development
+
+```bash
+trunk serve
+```
+
+## Build
+
+```bash
+trunk build --release
+```
