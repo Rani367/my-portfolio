@@ -4,8 +4,8 @@ use leptos::prelude::*;
 use leptos::task::spawn_local;
 use gloo_timers::future::TimeoutFuture;
 
-/// Set to false to disable the startup screen during development.
-const STARTUP_SCREEN_ENABLED: bool = false;
+/// Automatically enabled in release builds, disabled in debug builds.
+const STARTUP_SCREEN_ENABLED: bool = !cfg!(debug_assertions);
 
 /// Apple-style startup screen with logo and progress bar.
 #[component]

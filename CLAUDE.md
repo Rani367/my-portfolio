@@ -21,7 +21,7 @@ This is a macOS replica portfolio website built with **Rust and Leptos**, compil
 - **Windows**: Draggable window system with z-index management, minimize/maximize/close
 - **Finder**: Hierarchical folder/file navigation for projects, about, resume, and trash
 - **Spotlight Search**: Search apps and locations via menu bar icon
-- **Startup Screen**: Apple-style boot animation (toggle via `STARTUP_SCREEN_ENABLED` in `src/components/startup/startup.rs`)
+- **Startup Screen**: Apple-style boot animation (auto-enabled in release builds, disabled in debug)
 - **Notifications**: Toast notifications with auto-dismiss
 
 ### Key Directories
@@ -107,7 +107,6 @@ Output in `dist/` directory.
 ### Configuration
 - `Trunk.toml` - Trunk build configuration
 - `Cargo.toml` - Rust dependencies
-- `src/components/startup/startup.rs` - Set `STARTUP_SCREEN_ENABLED = false` for development
 
 ## Common Patterns
 
