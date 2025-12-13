@@ -1,0 +1,31 @@
+[package]
+name = "my-portfolio-leptos"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+leptos = { version = "0.8", features = ["csr"] }
+wasm-bindgen = "0.2"
+wasm-bindgen-futures = "0.4"
+web-sys = { version = "0.3", features = [
+    "Window", "Document", "Element", "HtmlElement",
+    "HtmlInputElement", "HtmlCanvasElement", "CanvasRenderingContext2d",
+    "MouseEvent", "KeyboardEvent", "DragEvent",
+    "CssStyleDeclaration", "DomRect", "Navigator",
+    "console", "Storage", "Performance"
+]}
+gloo = "0.11"
+gloo-timers = { version = "0.3", features = ["futures"] }
+console_error_panic_hook = "0.1"
+serde = { version = "1.0", features = ["derive"] }
+chrono = { version = "0.4", features = ["wasmbind"] }
+js-sys = "0.3"
+
+[profile.release]
+lto = true
+opt-level = "z"
+codegen-units = 1
+panic = "abort"

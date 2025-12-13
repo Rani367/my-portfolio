@@ -1,0 +1,14 @@
+# Rust/Cargo
+/target/
+
+# Trunk build output
+/dist/
+
+# OS files
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
