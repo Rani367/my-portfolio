@@ -104,6 +104,8 @@ trunk build --release
 ```
 Output in `dist/` directory.
 
+**Note**: A pre-commit hook automatically runs `trunk build --release` when source files are staged, so you don't need to manually build before committing.
+
 ### Configuration
 - `Trunk.toml` - Trunk build configuration
 - `Cargo.toml` - Rust dependencies
