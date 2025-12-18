@@ -1,30 +1,78 @@
-//! Apple-style startup screen component.
+//! 3D typing startup screen component.
 
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use gloo_timers::future::TimeoutFuture;
 
 /// Automatically enabled in release builds, disabled in debug builds.
-const STARTUP_SCREEN_ENABLED: bool = !cfg!(debug_assertions);
+const STARTUP_SCREEN_ENABLED: bool = true; // TODO: revert to !cfg!(debug_assertions)
 
-/// Apple-style startup screen with logo and progress bar.
+/// The name to type out on startup.
+const NAME: &str = "Hi, I'm Rani";
+
+/// Base typing speed in milliseconds.
+const BASE_TYPING_MS: u32 = 160;
+
+/// Random variation range (±ms) - smaller for smoother typing.
+const TYPING_VARIATION_MS: u32 = 40;
+
+/// Generate a human-like random delay for typing.
+fn human_typing_delay(char_index: usize, ch: char) -> u32 {
+    // Simple pseudo-random based on character and position
+    let seed = (char_index as u32 * 7 + ch as u32 * 13) % 100;
+
+    // Base delay with random variation
+    let variation = (seed % (TYPING_VARIATION_MS * 2)) as i32 - TYPING_VARIATION_MS as i32;
+    let delay = (BASE_TYPING_MS as i32 + variation).max(80) as u32;
+
+    // Add slight pause after space (between words)
+    if ch == ' ' {
+        delay + 80
+    }
+    // Occasional subtle pause
+    else if seed < 8 {
+        delay + 60
+    } else {
+        delay
+    }
+}
+
+/// 3D typing startup screen that types out "Rani Malach".
 #[component]
 pub fn StartupScreen() -> impl IntoView {
     // Skip rendering if disabled
     if !STARTUP_SCREEN_ENABLED {
         return view! {}.into_any();
     }
+    let (displayed_text, set_displayed_text) = signal(String::new());
+    let (is_typing_done, set_is_typing_done) = signal(false);
     let (is_fading, set_is_fading) = signal(false);
     let (is_removed, set_is_removed) = signal(false);
 
-    // Start the fade-out timer after startup animation completes
-    // Total: 1s delay + 2s progress animation = 3s
+    // Typing animation
     spawn_local(async move {
-        // Wait for startup animation to complete (3s total)
-        TimeoutFuture::new(3000).await;
+        // Initial delay before typing starts
+        TimeoutFuture::new(500).await;
+
+        // Type out each character with human-like timing
+        let chars: Vec<char> = NAME.chars().collect();
+        for (i, ch) in chars.iter().enumerate() {
+            let delay = human_typing_delay(i, *ch);
+            TimeoutFuture::new(delay).await;
+            let text: String = chars[..=i].iter().collect();
+            set_displayed_text.set(text);
+        }
+
+        // Mark typing as done
+        set_is_typing_done.set(true);
+
+        // Wait a moment to show the complete text before fading
+        TimeoutFuture::new(1200).await;
+
+        // Start fade out
         set_is_fading.set(true);
 
-        // Wait for fade-out animation to complete (0.5s)
+        // Wait for fade-out animation to complete
         TimeoutFuture::new(500).await;
         set_is_removed.set(true);
     });
@@ -37,15 +85,27 @@ pub fn StartupScreen() -> impl IntoView {
                 view! {
                     <div
                         id="startup-screen"
-                        class=move || if is_fading.get() { "fade-out" } else { "" }
+                        class=move || {
+                            let mut classes = String::from("startup-3d");
+                            if is_fading.get() {
+                                classes.push_str(" fade-out");
+                            }
+                            classes
+                        }
                     >
-                        <div class="startup-content">
-                            <svg class="startup-logo" viewBox="0 0 170 170" fill="white">
-                                <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.197-2.12-9.973-3.17-14.34-3.17-4.58 0-9.492 1.05-14.746 3.17-5.262 2.13-9.501 3.24-12.742 3.35-4.929.21-9.842-1.96-14.746-6.52-3.13-2.73-7.045-7.41-11.735-14.04-5.032-7.08-9.169-15.29-12.41-24.65-3.471-10.11-5.211-19.9-5.211-29.378 0-10.857 2.346-20.221 7.045-28.068 3.693-6.303 8.606-11.275 14.755-14.925s12.793-5.51 19.948-5.629c3.915 0 9.049 1.211 15.429 3.591 6.362 2.388 10.447 3.599 12.238 3.599 1.339 0 5.877-1.416 13.57-4.239 7.275-2.618 13.415-3.702 18.445-3.275 13.63 1.1 23.87 6.473 30.68 16.153-12.19 7.386-18.22 17.731-18.1 31.002.11 10.337 3.86 18.939 11.23 25.769 3.34 3.17 7.07 5.62 11.22 7.36-.9 2.61-1.85 5.11-2.86 7.51zM119.11 7.24c0 8.102-2.96 15.667-8.86 22.669-7.12 8.324-15.732 13.134-25.071 12.375a25.222 25.222 0 0 1-.188-3.07c0-7.778 3.386-16.102 9.399-22.908 3.002-3.446 6.82-6.311 11.45-8.597 4.62-2.252 8.99-3.497 13.1-3.71.12 1.083.17 2.166.17 3.24z" />
-                            </svg>
-                            <div class="startup-progress">
-                                <div class="startup-progress-bar"></div>
-                            </div>
+                        <div class="startup-3d-content">
+                            <h1 class=move || {
+                                let mut classes = String::from("startup-3d-text");
+                                if is_typing_done.get() {
+                                    classes.push_str(" typing-done");
+                                }
+                                classes
+                            }>
+                                {move || displayed_text.get()}
+                                <span class=move || {
+                                    if is_typing_done.get() { "cursor hidden" } else { "cursor" }
+                                }>"|"</span>
+                            </h1>
                         </div>
                     </div>
                 }.into_any()
