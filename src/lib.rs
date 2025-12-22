@@ -12,7 +12,7 @@ use components::{
     Window, MenuBar, Dock, FinderContent, TxtFileContent, ImgFileContent,
     TerminalContent, ContactContent, PhotosContent, AboutContent, SafariContent,
     ResumeContent, Spotlight, StartupScreen, NotificationCenter,
-    MobileHomeScreen, MobileAppContainer,
+    MobilePortfolio,
 };
 
 #[component]
@@ -168,50 +168,11 @@ fn App() -> impl IntoView {
         <Spotlight />
 
         // ========================================
-        // MOBILE UI (iOS Mode)
+        // MOBILE UI (Simple Portfolio)
         // ========================================
+        <MobilePortfolio />
 
-        // iOS-style home screen with app grid
-        <MobileHomeScreen />
-
-        // Mobile app containers (full-screen with swipe to close)
-        <MobileAppContainer id=WindowId::Finder title="Portfolio">
-            <FinderContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::Terminal title="Skills">
-            <TerminalContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::Contact title="Contact">
-            <ContactContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::Photos title="Gallery">
-            <PhotosContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::Safari title="Safari">
-            <SafariContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::Resume title="Resume">
-            <ResumeContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::About title="About">
-            <AboutContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::TxtFile title="TextEdit">
-            <TxtFileContent />
-        </MobileAppContainer>
-
-        <MobileAppContainer id=WindowId::ImgFile title="Preview">
-            <ImgFileContent />
-        </MobileAppContainer>
-
-        // Notification center (works on both mobile and desktop)
+        // Notification center (desktop only)
         <NotificationCenter />
     }
 }

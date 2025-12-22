@@ -8,9 +8,11 @@ pub mod use_battery;
 pub mod use_network;
 pub mod use_clock;
 pub mod use_mobile;
+pub mod use_scroll;
 
 pub use use_keyboard::*;
 pub use use_battery::*;
 pub use use_network::*;
 pub use use_clock::*;
 pub use use_mobile::*;
+pub use use_scroll::*;

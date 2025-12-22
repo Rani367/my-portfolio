@@ -15,7 +15,8 @@ web-sys = { version = "0.3", features = [
     "HtmlInputElement", "HtmlCanvasElement", "CanvasRenderingContext2d",
     "MouseEvent", "KeyboardEvent", "DragEvent",
     "CssStyleDeclaration", "DomRect", "Navigator", "Clipboard",
-    "console", "Storage", "Performance"
+    "console", "Storage", "Performance",
+    "IntersectionObserver", "IntersectionObserverInit", "IntersectionObserverEntry"
 ]}
 gloo = "0.11"
 gloo-timers = { version = "0.3", features = ["futures"] }

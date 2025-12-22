@@ -2244,617 +2244,537 @@ body.mobile-app-open {
 }
 
 /* ============================================
-   MOBILE STYLES - iOS MODE
+   MOBILE STYLES - 3D Interactive Portfolio
    ============================================ */
 
+/* CSS Custom Properties for 3D theme */
 :root {
-    /* Mobile breakpoints */
-    --breakpoint-phone: 640px;
-    --breakpoint-tablet: 768px;
-
-    /* Mobile sizing */
-    --mobile-status-bar-height: 54px;
-    --mobile-home-indicator-height: 34px;
-    --mobile-app-icon-size: 60px;
-    --mobile-touch-target: 44px;
-
-    /* Mobile safe areas */
-    --safe-area-top: env(safe-area-inset-top, 0px);
-    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-    --safe-area-left: env(safe-area-inset-left, 0px);
-    --safe-area-right: env(safe-area-inset-right, 0px);
+    --mobile-bg: #0a0a0a;
+    --mobile-bg-secondary: #111111;
+    --mobile-card-bg: #1a1a1a;
+    --mobile-text: #ffffff;
+    --mobile-text-secondary: #888888;
+    --mobile-accent: #3b82f6;
+    --mobile-accent-glow: rgba(59, 130, 246, 0.3);
+    --mobile-accent-subtle: rgba(59, 130, 246, 0.1);
 }
 
-/* Hide desktop elements on mobile */
-@media (max-width: 767px) {
-    #menu-bar,
-    #dock,
-    #windows-container,
-    #spotlight-overlay {
-        display: none !important;
-    }
-}
-
-/* ============================================
-   MOBILE HOME SCREEN
-   ============================================ */
-
-.mobile-home-screen {
+/* Hide mobile portfolio on desktop */
+.mobile-portfolio-3d {
     display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    flex-direction: column;
-    z-index: 9000;
-    padding-top: var(--safe-area-top);
-    padding-left: var(--safe-area-left);
-    padding-right: var(--safe-area-right);
 }
 
-/* Ensure mobile home screen is hidden on desktop */
-@media (min-width: 768px) {
-    .mobile-home-screen,
-    .mobile-home-screen.visible {
+/* Mobile breakpoint - show portfolio, hide desktop */
+@media (max-width: 767px) {
+    /* Hide desktop UI */
+    #menu-bar,
+    #desktop,
+    #dock,
+    .notification-center {
         display: none !important;
     }
-}
 
-@media (max-width: 767px) {
-    .mobile-home-screen.visible {
-        display: flex;
+    /* Show mobile portfolio */
+    .mobile-portfolio-3d {
+        display: block;
+        min-height: 100vh;
+        background: var(--mobile-bg);
+        color: var(--mobile-text);
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+        overflow-x: hidden;
+        perspective: 1000px;
+    }
+
+    html {
+        scroll-behavior: smooth;
     }
 }
 
 /* ============================================
-   MOBILE STATUS BAR
+   3D HERO SECTION
    ============================================ */
-
-.mobile-status-bar {
-    height: var(--mobile-status-bar-height);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 24px;
-    color: white;
-    font-size: 14px;
-    font-weight: 600;
-    flex-shrink: 0;
-}
-
-.mobile-status-left,
-.mobile-status-right {
+.mobile-hero-3d {
+    min-height: 100vh;
     display: flex;
     align-items: center;
-    gap: 6px;
-    min-width: 80px;
-}
-
-.mobile-status-right {
-    justify-content: flex-end;
-}
-
-.mobile-status-notch {
-    width: 126px;
-    height: 37px;
-    background: #000;
-    border-radius: 20px;
-    flex-shrink: 0;
-}
-
-@media (max-width: 400px) {
-    .mobile-status-notch {
-        width: 100px;
-        height: 30px;
-    }
-}
-
-.mobile-time {
-    font-weight: 600;
-    letter-spacing: -0.3px;
-}
-
-.mobile-signal,
-.mobile-wifi,
-.mobile-battery {
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.mobile-wifi-icon {
-    width: 16px;
-    height: 16px;
-}
-
-/* ============================================
-   MOBILE APP GRID
-   ============================================ */
-
-.mobile-app-grid {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px 16px;
-    padding: 24px 24px 16px;
-    align-content: start;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-@media (max-width: 380px) {
-    .mobile-app-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px 12px;
-        padding: 20px 16px 12px;
-    }
-}
-
-/* ============================================
-   MOBILE APP ICON
-   ============================================ */
-
-.mobile-app-icon {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    padding: 0;
-}
-
-.mobile-app-icon-wrapper {
-    width: var(--mobile-app-icon-size);
-    height: var(--mobile-app-icon-size);
-    border-radius: 14px;
+    justify-content: center;
+    padding: 60px 24px;
+    position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transition: transform 0.15s ease;
-    background: rgba(255, 255, 255, 0.1);
 }
 
-.mobile-app-icon-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+/* Floating orbs - subtle accent lighting */
+.hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    will-change: transform;
 }
 
-.mobile-app-icon:active .mobile-app-icon-wrapper {
-    transform: scale(0.88);
+.hero-orb.orb-1 {
+    width: 300px;
+    height: 300px;
+    background: var(--mobile-accent-glow);
+    top: 10%;
+    right: -100px;
+    opacity: 0.4;
 }
 
-.mobile-app-label {
-    font-size: 11px;
-    color: white;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+.hero-orb.orb-2 {
+    width: 200px;
+    height: 200px;
+    background: rgba(139, 92, 246, 0.2);
+    bottom: 20%;
+    left: -50px;
+    opacity: 0.3;
+}
+
+.hero-orb.orb-3 {
+    width: 150px;
+    height: 150px;
+    background: rgba(16, 185, 129, 0.15);
+    top: 40%;
+    left: 60%;
+    opacity: 0.25;
+}
+
+.hero-content-3d {
+    position: relative;
+    z-index: 10;
     text-align: center;
-    max-width: 74px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-weight: 500;
-    letter-spacing: -0.2px;
+    max-width: 400px;
+    will-change: transform;
 }
 
-/* ============================================
-   MOBILE DOCK BAR
-   ============================================ */
+.hero-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--mobile-accent-subtle);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--mobile-accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+}
 
-.mobile-dock-bar {
-    height: calc(90px + var(--mobile-home-indicator-height));
-    padding: 8px 20px;
-    padding-bottom: calc(8px + var(--safe-area-bottom));
+.hero-name-3d {
+    margin: 0 0 20px 0;
+}
+
+.hero-name-3d .name-line {
+    display: block;
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--mobile-text);
+    letter-spacing: -2px;
+}
+
+.hero-name-3d .name-line:last-child {
+    color: var(--mobile-accent);
+}
+
+.hero-tagline-3d {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--mobile-text-secondary);
+    margin: 0 0 32px 0;
+}
+
+.hero-tagline-3d .highlight {
+    color: var(--mobile-text);
+    font-weight: 500;
+}
+
+.hero-cta {
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    flex-shrink: 0;
 }
 
-.mobile-dock-bar-inner {
-    display: flex;
-    gap: 16px;
-    padding: 10px 20px;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-radius: 28px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.mobile-dock-bar .mobile-app-icon {
-    gap: 0;
-}
-
-.mobile-dock-bar .mobile-app-icon-wrapper {
-    width: 54px;
-    height: 54px;
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
     border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.mobile-dock-bar .mobile-app-label {
-    display: none;
+.cta-btn.primary {
+    background: var(--mobile-accent);
+    color: white;
+    box-shadow:
+        0 4px 12px rgba(59, 130, 246, 0.3),
+        0 8px 24px rgba(59, 130, 246, 0.2);
+}
+
+.cta-btn.primary:active {
+    transform: scale(0.98);
+}
+
+.cta-btn .btn-arrow {
+    font-size: 1.2rem;
+    animation: bounce-down 2s ease-in-out infinite;
+}
+
+@keyframes bounce-down {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.scroll-line {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--mobile-accent), transparent);
+    border-radius: 1px;
+    animation: scroll-fade 2s ease-in-out infinite;
+}
+
+@keyframes scroll-fade {
+    0%, 100% { opacity: 0.3; transform: scaleY(0.5); }
+    50% { opacity: 1; transform: scaleY(1); }
 }
 
 /* ============================================
-   MOBILE HOME INDICATOR
+   REVEAL ANIMATIONS
    ============================================ */
-
-.mobile-home-indicator {
-    position: fixed;
-    bottom: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 134px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 3px;
+.reveal-card {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (min-width: 768px) {
-    .mobile-home-indicator {
+.reveal-card.visible,
+.section-visible .reveal-card {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   SECTION HEADERS
+   ============================================ */
+.section-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.section-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--mobile-accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+}
+
+.section-title-3d {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--mobile-text);
+}
+
+/* ============================================
+   3D PROJECT CARDS
+   ============================================ */
+.mobile-projects-3d {
+    padding: 80px 20px;
+    background: var(--mobile-bg-secondary);
+}
+
+.projects-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.project-card-3d {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.project-card-3d .card-inner {
+    background: var(--mobile-card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 10px 20px rgba(0, 0, 0, 0.1),
+        0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.project-card-3d:active .card-inner {
+    transform: scale(0.98);
+}
+
+.card-image-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6));
+    pointer-events: none;
+}
+
+.card-content {
+    padding: 24px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--mobile-text);
+}
+
+.card-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--mobile-text-secondary);
+    margin: 0 0 16px 0;
+}
+
+.card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--mobile-accent);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.card-link .link-arrow {
+    transition: transform 0.2s ease;
+}
+
+.project-card-3d:hover .link-arrow,
+.project-card-3d:active .link-arrow {
+    transform: translateX(4px);
+}
+
+/* ============================================
+   3D SKILLS SECTION
+   ============================================ */
+.mobile-skills-3d {
+    padding: 80px 20px;
+    background: var(--mobile-bg);
+}
+
+.skills-container {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.skill-category-3d {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.section-visible .skill-category-3d {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.section-visible .skill-category-3d:nth-child(1) { transition-delay: 0.1s; }
+.section-visible .skill-category-3d:nth-child(2) { transition-delay: 0.2s; }
+.section-visible .skill-category-3d:nth-child(3) { transition-delay: 0.3s; }
+.section-visible .skill-category-3d:nth-child(4) { transition-delay: 0.4s; }
+.section-visible .skill-category-3d:nth-child(5) { transition-delay: 0.5s; }
+
+.category-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--mobile-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 16px 0;
+}
+
+.skill-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.skill-badge-3d {
+    display: inline-block;
+    padding: 10px 18px;
+    background: var(--mobile-card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--mobile-text);
+    box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.1),
+        0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    animation: float-in 0.5s ease backwards;
+}
+
+.section-visible .skill-badge-3d {
+    animation-play-state: running;
+}
+
+@keyframes float-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.skill-badge-3d:active {
+    transform: scale(0.95);
+    background: rgba(59, 130, 246, 0.1);
+    border-color: var(--mobile-accent);
+}
+
+/* ============================================
+   3D CONTACT SECTION
+   ============================================ */
+.mobile-contact-3d {
+    padding: 80px 20px;
+    background: var(--mobile-bg-secondary);
+}
+
+.contact-text-3d {
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--mobile-text-secondary);
+    margin: 0 0 40px 0;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 320px;
+    margin: 0 auto;
+}
+
+.contact-link-3d {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 24px;
+    background: var(--mobile-card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--mobile-text);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 8px 16px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.contact-link-3d:active {
+    transform: scale(0.98);
+    background: rgba(59, 130, 246, 0.05);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.contact-icon {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.contact-name {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.email-link .email-icon {
+    font-size: 1.25rem;
+}
+
+/* ============================================
+   3D FOOTER
+   ============================================ */
+.mobile-footer-3d {
+    padding: 40px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--mobile-bg);
+}
+
+.mobile-footer-3d p {
+    margin: 0 0 4px 0;
+    font-size: 0.85rem;
+    color: var(--mobile-text-secondary);
+}
+
+.mobile-footer-3d .footer-tech {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    .reveal-card,
+    .skill-badge-3d,
+    .cta-btn,
+    .project-card-3d .card-inner,
+    .contact-link-3d {
+        transition: none;
+        animation: none;
+    }
+
+    .scroll-line,
+    .cta-btn .btn-arrow {
+        animation: none;
+    }
+
+    .hero-orb {
         display: none;
     }
 }
 
-/* ============================================
-   MOBILE APP CONTAINER
-   ============================================ */
-
-.mobile-app-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--bg-window);
-    z-index: 10000;
-    display: none;
-    flex-direction: column;
-    will-change: transform, opacity;
-    overflow: hidden;
-}
-
-/* Only show mobile app containers on mobile devices */
-@media (max-width: 767px) {
-    .mobile-app-container.active {
-        display: flex;
-        animation: mobileAppOpen 0.35s var(--ease-out-expo) forwards;
-    }
-
-    .mobile-app-container.closing {
-        animation: mobileAppClose 0.25s ease-out forwards;
-    }
-}
-
-@keyframes mobileAppOpen {
-    from {
-        transform: scale(0.92) translateY(60px);
-        opacity: 0;
-        border-radius: 40px;
-    }
-    to {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-        border-radius: 0;
-    }
-}
-
-@keyframes mobileAppClose {
-    from {
-        transform: scale(1) translateY(0);
-        opacity: 1;
-        border-radius: 0;
-    }
-    to {
-        transform: scale(0.92) translateY(100vh);
-        opacity: 0;
-        border-radius: 40px;
-    }
-}
-
-/* ============================================
-   MOBILE APP HEADER
-   ============================================ */
-
-.mobile-app-header {
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 16px;
-    padding-top: var(--safe-area-top);
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-.mobile-back-btn {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-    background: none;
-    border: none;
-    color: var(--accent-blue);
-    font-size: 17px;
-    font-weight: 400;
-    padding: 8px 0;
-    min-height: var(--mobile-touch-target);
-    min-width: var(--mobile-touch-target);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.mobile-back-btn:active {
-    opacity: 0.6;
-}
-
-.mobile-back-icon {
-    width: 24px;
-    height: 24px;
-    stroke-width: 2.5;
-}
-
-.mobile-app-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
-}
-
-.mobile-header-spacer {
-    min-width: var(--mobile-touch-target);
-}
-
-/* ============================================
-   MOBILE APP CONTENT
-   ============================================ */
-
-.mobile-app-content {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: calc(var(--mobile-home-indicator-height) + var(--safe-area-bottom));
-}
-
-/* Adjust content within mobile app containers */
-.mobile-app-content .finder-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-app-content .finder-sidebar {
-    display: none;
-}
-
-.mobile-app-content .finder-content {
-    flex: 1;
-    padding: 16px;
-    overflow-y: auto;
-}
-
-.mobile-app-content .finder-content.files-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    align-content: start;
-}
-
-@media (max-width: 380px) {
-    .mobile-app-content .finder-content.files-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-.mobile-app-content .file-item {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    width: 100% !important;
-}
-
-/* Terminal adjustments */
-.mobile-app-content .terminal-container {
-    height: 100%;
-}
-
-.mobile-app-content .terminal-body {
-    font-size: 13px;
-    padding: 16px;
-    height: 100%;
-    overflow-y: auto;
-}
-
-/* Contact adjustments */
-.mobile-app-content .socials-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 16px;
-}
-
-/* Photos adjustments */
-.mobile-app-content .photos-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-app-content .photos-sidebar {
-    display: none;
-}
-
-.mobile-app-content .gallery-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    padding: 12px;
-}
-
-/* Safari adjustments */
-.mobile-app-content .safari-container {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.mobile-app-content .safari-toolbar {
-    padding: 8px 12px;
-    flex-shrink: 0;
-}
-
-.mobile-app-content .safari-toolbar-left,
-.mobile-app-content .safari-toolbar-right {
-    display: none;
-}
-
-.mobile-app-content .safari-address-bar {
-    flex: 1;
-    max-width: 100%;
-}
-
-.mobile-app-content .safari-content {
-    flex: 1;
-}
-
-/* Resume viewer adjustments */
-.mobile-app-content .resume-container {
-    height: 100%;
-}
-
-.mobile-app-content .resume-toolbar {
-    padding: 8px 12px;
-}
-
-/* About window adjustments */
-.mobile-app-content .about-container {
-    padding: 24px 16px;
-}
-
-.mobile-app-content .about-title {
-    font-size: 22px;
-}
-
-.mobile-app-content .about-logo {
-    width: 64px;
-    height: 64px;
-}
-
-/* Text file viewer adjustments */
-.mobile-app-content .txtfile-body {
-    padding: 16px;
-    padding-bottom: calc(16px + var(--safe-area-bottom));
-}
-
-.mobile-app-content .txt-header {
-    flex-direction: column;
-    gap: 12px;
-    text-align: center;
-    align-items: center;
-}
-
-.mobile-app-content .txt-header-image {
-    width: 60px;
-    height: 60px;
-}
-
-.mobile-app-content .txt-header-content {
-    text-align: center;
-}
-
-.mobile-app-content .txt-content {
-    font-size: 15px;
-    line-height: 1.6;
-}
-
-/* Image file viewer adjustments */
-.mobile-app-content .imgfile-body {
-    padding: 12px;
-    padding-bottom: calc(12px + var(--safe-area-bottom));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mobile-app-content .img-preview {
-    max-height: calc(100vh - 140px);
-    max-width: 100%;
-    object-fit: contain;
-}
-
-/* Contact body padding fix */
-.mobile-app-content .contact-body {
-    padding: 16px;
-}
-
-/* Touch target sizes (44px minimum for iOS) */
-.mobile-app-content .pdf-btn {
-    min-width: 44px;
-    min-height: 44px;
-}
-
-.mobile-app-content .resume-download-btn {
-    min-height: 44px;
-    padding: 12px 20px;
-}
-
-/* Finder file grid improvements */
-.mobile-app-content .file-icon {
-    width: 48px;
-    height: 48px;
-}
-
-.mobile-app-content .file-item-name {
-    font-size: 12px;
-    line-height: 1.3;
-    word-break: break-word;
-}
-
-/* Safe area horizontal padding */
-.mobile-app-content {
-    padding-left: var(--safe-area-left);
-    padding-right: var(--safe-area-right);
-    overscroll-behavior: contain;
-}
-
-/* Overscroll prevention when app is open */
-body.mobile-app-open {
-    overflow: hidden;
-    overscroll-behavior: none;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-}
-
-/* Animation smoothness */
-.mobile-app-container {
-    will-change: transform, opacity;
-}
-
-/* Mobile scrollbar */
-@media (max-width: 767px) {
-    ::-webkit-scrollbar {
-        width: 4px;
-    }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .mobile-app-container {
-        animation: none !important;
-        transition: none !important;
-    }
-    .mobile-app-container.closing {
-        animation: none !important;
-        transition: none !important;
-    }
-    .mobile-app-container.active {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}

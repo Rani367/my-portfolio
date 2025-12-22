@@ -17,4 +17,4 @@ pub use dock::Dock;
 pub use spotlight::Spotlight;
 pub use startup::StartupScreen;
 pub use notifications::NotificationCenter;
-pub use mobile::{MobileHomeScreen, MobileAppContainer, MobileStatusBar};
+pub use mobile::MobilePortfolio;
