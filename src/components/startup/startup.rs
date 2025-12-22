@@ -50,45 +50,35 @@ fn human_typing_delay(char_index: usize, ch: char) -> u32 {
 /// 3D typing startup screen that types out "Rani Malach".
 #[component]
 pub fn StartupScreen() -> impl IntoView {
-    // Skip rendering if disabled
-    if !STARTUP_SCREEN_ENABLED {
+    // Skip rendering if disabled or on mobile
+    if !STARTUP_SCREEN_ENABLED || is_mobile() {
         return ().into_any();
     }
 
-    let mobile = is_mobile();
-
-    // On mobile, show full text immediately; on desktop, type it out
-    let initial_text = if mobile { NAME.to_string() } else { String::new() };
-
-    let (displayed_text, set_displayed_text) = signal(initial_text);
-    let (is_typing_done, set_is_typing_done) = signal(mobile); // Already done on mobile
+    let (displayed_text, set_displayed_text) = signal(String::new());
+    let (is_typing_done, set_is_typing_done) = signal(false);
     let (is_fading, set_is_fading) = signal(false);
     let (is_removed, set_is_removed) = signal(false);
 
-    // Typing animation (only runs the typing part on desktop)
+    // Typing animation
     spawn_local(async move {
-        if mobile {
-            // On mobile, just wait and fade out
-            TimeoutFuture::new(2000).await;
-        } else {
-            // Desktop: Initial delay before typing starts
-            TimeoutFuture::new(500).await;
+        // Initial delay before typing starts
+        TimeoutFuture::new(500).await;
 
-            // Type out each character with human-like timing
-            let chars: Vec<char> = NAME.chars().collect();
-            for (i, ch) in chars.iter().enumerate() {
-                let delay = human_typing_delay(i, *ch);
-                TimeoutFuture::new(delay).await;
-                let text: String = chars[..=i].iter().collect();
-                set_displayed_text.set(text);
-            }
-
-            // Mark typing as done
-            set_is_typing_done.set(true);
-
-            // Wait a moment to show the complete text before fading
-            TimeoutFuture::new(1200).await;
+        // Type out each character with human-like timing
+        let chars: Vec<char> = NAME.chars().collect();
+        for (i, ch) in chars.iter().enumerate() {
+            let delay = human_typing_delay(i, *ch);
+            TimeoutFuture::new(delay).await;
+            let text: String = chars[..=i].iter().collect();
+            set_displayed_text.set(text);
         }
+
+        // Mark typing as done
+        set_is_typing_done.set(true);
+
+        // Wait a moment to show the complete text before fading
+        TimeoutFuture::new(1200).await;
 
         // Start fade out
         set_is_fading.set(true);
