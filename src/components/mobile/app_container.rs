@@ -8,10 +8,19 @@ use js_sys::Reflect;
 use web_sys::TouchEvent;
 use crate::state::{use_app_state, WindowId};
 
-/// Swipe threshold in pixels to trigger close.
-const SWIPE_THRESHOLD: f64 = 100.0;
 /// Velocity threshold (pixels per millisecond) to trigger close.
 const VELOCITY_THRESHOLD: f64 = 0.5;
+/// Animation duration in milliseconds.
+const ANIMATION_DURATION: u64 = 300;
+
+/// Get viewport-relative swipe threshold (15% of viewport height, min 50px).
+fn get_swipe_threshold() -> f64 {
+    web_sys::window()
+        .and_then(|w| w.inner_height().ok())
+        .and_then(|h| h.as_f64())
+        .map(|h| (h * 0.15).max(50.0))
+        .unwrap_or(100.0)
+}
 
 /// Get the Y position from a touch event's first touch point using Reflect.
 fn get_touch_y(event: &TouchEvent) -> Option<f64> {
@@ -46,21 +55,39 @@ pub fn MobileAppContainer(
         app_state.mobile_active_app.get() == Some(id)
     });
 
-    // Toggle body scroll lock when app becomes active/inactive
-    Effect::new(move |_| {
-        let active = is_active.get();
-        if let Some(window) = web_sys::window() {
-            if let Some(document) = window.document() {
-                if let Some(body) = document.body() {
-                    if active {
-                        let _ = body.class_list().add_1("mobile-app-open");
-                    } else {
-                        let _ = body.class_list().remove_1("mobile-app-open");
+    // Toggle body scroll lock and handle transition completion
+    {
+        let app_state = app_state.clone();
+        Effect::new(move |prev_active: Option<bool>| {
+            let active = is_active.get();
+
+            // Handle body scroll lock
+            if let Some(window) = web_sys::window() {
+                if let Some(document) = window.document() {
+                    if let Some(body) = document.body() {
+                        if active {
+                            let _ = body.class_list().add_1("mobile-app-open");
+                        } else {
+                            let _ = body.class_list().remove_1("mobile-app-open");
+                        }
                     }
                 }
             }
-        }
-    });
+
+            // Mark transition complete after open animation
+            if active && prev_active != Some(true) {
+                let app_state = app_state.clone();
+                set_timeout(
+                    move || {
+                        app_state.mobile_transition_complete();
+                    },
+                    std::time::Duration::from_millis(ANIMATION_DURATION),
+                );
+            }
+
+            active
+        });
+    }
 
     // Handle touch start
     let on_touch_start = move |e: TouchEvent| {
@@ -91,16 +118,17 @@ pub fn MobileAppContainer(
     let on_touch_end = {
         let app_state = app_state.clone();
         move |_: TouchEvent| {
-            if !is_swiping.get() {
+            if !is_swiping.get() || is_closing.get() {
                 return;
             }
 
             let offset = current_offset.get();
             let elapsed = js_sys::Date::now() - touch_start_time.get();
             let velocity = if elapsed > 0.0 { offset / elapsed } else { 0.0 };
+            let threshold = get_swipe_threshold();
 
             // Check if swipe threshold is met
-            if offset > SWIPE_THRESHOLD || velocity > VELOCITY_THRESHOLD {
+            if offset > threshold || velocity > VELOCITY_THRESHOLD {
                 // Trigger close animation
                 set_is_closing.set(true);
                 // Close after animation
@@ -108,10 +136,11 @@ pub fn MobileAppContainer(
                 set_timeout(
                     move || {
                         app_state.mobile_close_app();
+                        app_state.mobile_transition_complete();
                         set_is_closing.set(false);
                         set_current_offset.set(0.0);
                     },
-                    std::time::Duration::from_millis(250),
+                    std::time::Duration::from_millis(ANIMATION_DURATION),
                 );
             } else {
                 // Snap back
@@ -126,14 +155,19 @@ pub fn MobileAppContainer(
     let on_back_click = {
         let app_state = app_state.clone();
         move |_| {
+            // Prevent double-close if already closing
+            if is_closing.get() {
+                return;
+            }
             set_is_closing.set(true);
             let app_state = app_state.clone();
             set_timeout(
                 move || {
                     app_state.mobile_close_app();
+                    app_state.mobile_transition_complete();
                     set_is_closing.set(false);
                 },
-                std::time::Duration::from_millis(250),
+                std::time::Duration::from_millis(ANIMATION_DURATION),
             );
         }
     };

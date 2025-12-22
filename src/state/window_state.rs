@@ -141,7 +141,7 @@ impl WindowId {
         }
     }
 
-    /// Get window from dock app ID.
+    /// Get window from dock/mobile app ID.
     pub fn from_dock_id(id: &str) -> Option<WindowId> {
         match id {
             "finder" => Some(WindowId::Finder),
@@ -149,6 +149,8 @@ impl WindowId {
             "safari" => Some(WindowId::Safari),
             "photos" => Some(WindowId::Photos),
             "terminal" => Some(WindowId::Terminal),
+            "resume" => Some(WindowId::Resume),
+            "about" => Some(WindowId::About),
             _ => None,
         }
     }

@@ -54,31 +54,37 @@ fn device_type_from_width(width: f64) -> DeviceType {
 /// Hook that tracks device type and updates AppState.
 ///
 /// Returns a memo that updates when the viewport width crosses a breakpoint.
-/// Also sets up a resize listener to handle orientation changes and resize events.
+/// Sets up both resize and orientationchange listeners to handle all viewport changes.
 pub fn use_mobile_detection() -> Memo<DeviceType> {
     let app_state = use_app_state();
     let (width, set_width) = signal(get_viewport_width());
 
-    // Set up resize listener
+    // Set up resize and orientation listeners
     Effect::new(move |_| {
         let Some(win) = window() else { return };
 
         // Set initial width
         set_width.set(get_viewport_width());
 
-        // Create resize handler
-        let closure = Closure::wrap(Box::new(move |_: web_sys::Event| {
+        // Create handler for both events
+        let update_width = Closure::wrap(Box::new(move |_: web_sys::Event| {
             set_width.set(get_viewport_width());
         }) as Box<dyn Fn(_)>);
 
         // Add resize listener
         let _ = win.add_event_listener_with_callback(
             "resize",
-            closure.as_ref().unchecked_ref(),
+            update_width.as_ref().unchecked_ref(),
+        );
+
+        // Add orientationchange listener (fires before resize on iOS)
+        let _ = win.add_event_listener_with_callback(
+            "orientationchange",
+            update_width.as_ref().unchecked_ref(),
         );
 
         // Keep closure alive for the lifetime of the app
-        closure.forget();
+        update_width.forget();
     });
 
     // Compute device type from width (pure computation)
@@ -96,26 +102,9 @@ pub fn use_mobile_detection() -> Memo<DeviceType> {
 }
 
 /// Simple hook to check if currently on mobile.
-/// Returns a memo that updates when crossing the mobile breakpoint.
+/// Uses app_state.is_mobile which is set by use_mobile_detection().
+/// Call use_mobile_detection() first in the app root.
 pub fn use_is_mobile() -> Memo<bool> {
-    let (width, set_width) = signal(get_viewport_width());
-
-    Effect::new(move |_| {
-        let Some(win) = window() else { return };
-
-        set_width.set(get_viewport_width());
-
-        let closure = Closure::wrap(Box::new(move |_: web_sys::Event| {
-            set_width.set(get_viewport_width());
-        }) as Box<dyn Fn(_)>);
-
-        let _ = win.add_event_listener_with_callback(
-            "resize",
-            closure.as_ref().unchecked_ref(),
-        );
-
-        closure.forget();
-    });
-
-    Memo::new(move |_| width.get() < MOBILE_BREAKPOINT)
+    let app_state = use_app_state();
+    Memo::new(move |_| app_state.is_mobile.get())
 }

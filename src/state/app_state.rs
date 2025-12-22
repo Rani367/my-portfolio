@@ -32,6 +32,8 @@ pub struct AppState {
     pub is_mobile: RwSignal<bool>,
     /// Currently active app in mobile mode (single app view).
     pub mobile_active_app: RwSignal<Option<WindowId>>,
+    /// Whether a mobile app transition (open/close animation) is in progress.
+    pub is_mobile_transitioning: RwSignal<bool>,
 }
 
 impl AppState {
@@ -52,6 +54,7 @@ impl AppState {
             img_file_data: RwSignal::new(None),
             is_mobile: RwSignal::new(false),
             mobile_active_app: RwSignal::new(None),
+            is_mobile_transitioning: RwSignal::new(false),
         }
     }
 
@@ -174,17 +177,36 @@ impl AppState {
     }
 
     /// Open an app in mobile mode (single full-screen view).
-    pub fn mobile_open_app(&self, id: WindowId) {
+    /// Returns false if a transition is already in progress.
+    pub fn mobile_open_app(&self, id: WindowId) -> bool {
+        // Prevent rapid double-taps during animation
+        if self.is_mobile_transitioning.get_untracked() {
+            return false;
+        }
+        self.is_mobile_transitioning.set(true);
         self.mobile_active_app.set(Some(id));
         self.open_window(id);
+        true
     }
 
     /// Close the current mobile app (return to home screen).
-    pub fn mobile_close_app(&self) {
+    /// Returns false if a transition is already in progress.
+    pub fn mobile_close_app(&self) -> bool {
+        // Prevent rapid double-taps during animation
+        if self.is_mobile_transitioning.get_untracked() {
+            return false;
+        }
+        self.is_mobile_transitioning.set(true);
         if let Some(id) = self.mobile_active_app.get_untracked() {
             self.close_window(id);
         }
         self.mobile_active_app.set(None);
+        true
+    }
+
+    /// Mark mobile transition as complete (call after animation ends).
+    pub fn mobile_transition_complete(&self) {
+        self.is_mobile_transitioning.set(false);
     }
 
     /// Get app name for menu bar display.
