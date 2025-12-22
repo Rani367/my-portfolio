@@ -195,39 +195,31 @@ body.mobile-app-open {
 /* Mobile startup screen adjustments */
 @media (max-width: 767px) {
     .startup-3d-text {
-        font-size: clamp(2rem, 10vw, 4rem);
-        transform: rotate(-5deg) skewX(10deg);
+        font-size: clamp(1.8rem, 9vw, 3.5rem);
+        transform: none;
         text-shadow:
             -1px 1px #cacaca,
             -2px 2px #cacaca,
             -3px 3px #cacaca,
             -4px 4px #cacaca,
-            -5px 5px #cacaca,
-            -6px 6px #cacaca,
-            -10px 10px rgba(0, 0, 0, 0.2);
+            -8px 8px rgba(0, 0, 0, 0.2);
+        opacity: 1;
+        animation: mobileTextFadeIn 0.5s ease-out forwards;
     }
 
-    @keyframes text3dFadeIn {
-        from {
-            opacity: 0;
-            transform: rotate(-5deg) skewX(10deg) scale(0.9);
-        }
-        to {
-            opacity: 1;
-            transform: rotate(-5deg) skewX(10deg) scale(1);
-        }
+    .startup-3d-text.typing-done {
+        animation: mobileTextFadeIn 0.5s ease-out forwards;
     }
+}
 
-    @keyframes text3dPulse {
-        0% {
-            transform: rotate(-5deg) skewX(10deg) scale(1);
-        }
-        50% {
-            transform: rotate(-5deg) skewX(10deg) scale(1.05);
-        }
-        100% {
-            transform: rotate(-5deg) skewX(10deg) scale(1);
-        }
+@keyframes mobileTextFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
     }
 }
 
