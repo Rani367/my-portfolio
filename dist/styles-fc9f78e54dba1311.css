@@ -192,6 +192,45 @@ body.mobile-app-open {
     }
 }
 
+/* Mobile startup screen adjustments */
+@media (max-width: 767px) {
+    .startup-3d-text {
+        font-size: clamp(2rem, 10vw, 4rem);
+        transform: rotate(-5deg) skewX(10deg);
+        text-shadow:
+            -1px 1px #cacaca,
+            -2px 2px #cacaca,
+            -3px 3px #cacaca,
+            -4px 4px #cacaca,
+            -5px 5px #cacaca,
+            -6px 6px #cacaca,
+            -10px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes text3dFadeIn {
+        from {
+            opacity: 0;
+            transform: rotate(-5deg) skewX(10deg) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: rotate(-5deg) skewX(10deg) scale(1);
+        }
+    }
+
+    @keyframes text3dPulse {
+        0% {
+            transform: rotate(-5deg) skewX(10deg) scale(1);
+        }
+        50% {
+            transform: rotate(-5deg) skewX(10deg) scale(1.05);
+        }
+        100% {
+            transform: rotate(-5deg) skewX(10deg) scale(1);
+        }
+    }
+}
+
 /* ============================================
    LIQUID GLASS FOUNDATION STYLES
    ============================================ */
@@ -2310,15 +2349,18 @@ body.mobile-app-open {
     padding: 60px 24px;
     position: relative;
     overflow: hidden;
+    perspective: 1000px;
+    transform-style: preserve-3d;
 }
 
-/* Floating orbs - subtle accent lighting */
+/* Floating orbs - 3D positioned lighting */
 .hero-orb {
     position: absolute;
     border-radius: 50%;
-    filter: blur(80px);
+    filter: blur(60px);
     pointer-events: none;
     will-change: transform;
+    transform-style: preserve-3d;
 }
 
 .hero-orb.orb-1 {
@@ -2327,25 +2369,46 @@ body.mobile-app-open {
     background: var(--mobile-accent-glow);
     top: 10%;
     right: -100px;
-    opacity: 0.4;
+    opacity: 0.5;
+    transform: translateZ(-100px);
+    animation: float-orb-1 8s ease-in-out infinite;
 }
 
 .hero-orb.orb-2 {
     width: 200px;
     height: 200px;
-    background: rgba(139, 92, 246, 0.2);
+    background: rgba(139, 92, 246, 0.25);
     bottom: 20%;
     left: -50px;
-    opacity: 0.3;
+    opacity: 0.4;
+    transform: translateZ(-150px);
+    animation: float-orb-2 10s ease-in-out infinite;
 }
 
 .hero-orb.orb-3 {
     width: 150px;
     height: 150px;
-    background: rgba(16, 185, 129, 0.15);
+    background: rgba(16, 185, 129, 0.2);
     top: 40%;
     left: 60%;
-    opacity: 0.25;
+    opacity: 0.35;
+    transform: translateZ(-80px);
+    animation: float-orb-3 6s ease-in-out infinite;
+}
+
+@keyframes float-orb-1 {
+    0%, 100% { transform: translateZ(-100px) translateY(0) translateX(0); }
+    50% { transform: translateZ(-100px) translateY(-30px) translateX(20px); }
+}
+
+@keyframes float-orb-2 {
+    0%, 100% { transform: translateZ(-150px) translateY(0) translateX(0); }
+    50% { transform: translateZ(-150px) translateY(25px) translateX(-15px); }
+}
+
+@keyframes float-orb-3 {
+    0%, 100% { transform: translateZ(-80px) translateY(0) scale(1); }
+    50% { transform: translateZ(-80px) translateY(-20px) scale(1.1); }
 }
 
 .hero-content-3d {
@@ -2354,13 +2417,20 @@ body.mobile-app-open {
     text-align: center;
     max-width: 400px;
     will-change: transform;
+    transform-style: preserve-3d;
+    animation: hero-float 6s ease-in-out infinite;
+}
+
+@keyframes hero-float {
+    0%, 100% { transform: translateY(0) rotateX(0deg); }
+    50% { transform: translateY(-10px) rotateX(2deg); }
 }
 
 .hero-badge {
     display: inline-block;
     padding: 8px 16px;
     background: var(--mobile-accent-subtle);
-    border: 1px solid rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     border-radius: 100px;
     font-size: 0.75rem;
     font-weight: 600;
@@ -2368,10 +2438,13 @@ body.mobile-app-open {
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 24px;
+    transform: translateZ(30px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
 }
 
 .hero-name-3d {
     margin: 0 0 20px 0;
+    transform-style: preserve-3d;
 }
 
 .hero-name-3d .name-line {
@@ -2381,10 +2454,18 @@ body.mobile-app-open {
     line-height: 1;
     color: var(--mobile-text);
     letter-spacing: -2px;
+    transform: translateZ(20px);
+    text-shadow:
+        0 2px 4px rgba(0,0,0,0.3),
+        0 8px 16px rgba(0,0,0,0.2);
 }
 
 .hero-name-3d .name-line:last-child {
     color: var(--mobile-accent);
+    transform: translateZ(40px);
+    text-shadow:
+        0 2px 8px rgba(59, 130, 246, 0.4),
+        0 8px 24px rgba(59, 130, 246, 0.2);
 }
 
 .hero-tagline-3d {
@@ -2498,6 +2579,10 @@ body.mobile-app-open {
     font-weight: 700;
     margin: 0;
     color: var(--mobile-text);
+    text-shadow:
+        0 2px 4px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.2);
+    transform: translateZ(10px);
 }
 
 /* ============================================
@@ -2506,59 +2591,83 @@ body.mobile-app-open {
 .mobile-projects-3d {
     padding: 80px 20px;
     background: var(--mobile-bg-secondary);
+    perspective: 1000px;
 }
 
 .projects-container {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 32px;
     max-width: 500px;
     margin: 0 auto;
+    transform-style: preserve-3d;
 }
 
 .project-card-3d {
     display: block;
     text-decoration: none;
     color: inherit;
+    perspective: 1000px;
+    transform-style: preserve-3d;
 }
 
 .project-card-3d .card-inner {
     background: var(--mobile-card-bg);
     border-radius: 20px;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+    transform: rotateX(5deg) translateZ(0);
     box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.1),
-        0 10px 20px rgba(0, 0, 0, 0.1),
-        0 20px 40px rgba(0, 0, 0, 0.15);
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        0 15px 35px rgba(0, 0, 0, 0.25),
+        0 30px 60px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.section-visible .project-card-3d:nth-child(odd) .card-inner {
+    transform: rotateX(3deg) rotateY(-2deg) translateZ(20px);
+}
+
+.section-visible .project-card-3d:nth-child(even) .card-inner {
+    transform: rotateX(3deg) rotateY(2deg) translateZ(20px);
 }
 
 .project-card-3d:active .card-inner {
-    transform: scale(0.98);
+    transform: rotateX(0deg) rotateY(0deg) translateZ(40px) scale(0.98) !important;
+    box-shadow:
+        0 20px 40px rgba(59, 130, 246, 0.2),
+        0 30px 60px rgba(0, 0, 0, 0.3);
 }
 
 .card-image-wrapper {
     position: relative;
     overflow: hidden;
+    transform: translateZ(10px);
 }
 
 .card-image {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    transition: transform 0.4s ease;
+    transition: transform 0.5s ease;
+}
+
+.project-card-3d:active .card-image {
+    transform: scale(1.05);
 }
 
 .card-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.6));
+    background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.7));
     pointer-events: none;
 }
 
 .card-content {
     padding: 24px;
+    transform: translateZ(15px);
 }
 
 .card-title {
@@ -2566,6 +2675,7 @@ body.mobile-app-open {
     font-weight: 600;
     margin: 0 0 8px 0;
     color: var(--mobile-text);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .card-description {
@@ -2582,6 +2692,7 @@ body.mobile-app-open {
     color: var(--mobile-accent);
     font-size: 0.9rem;
     font-weight: 500;
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }
 
 .card-link .link-arrow {
@@ -2599,6 +2710,7 @@ body.mobile-app-open {
 .mobile-skills-3d {
     padding: 80px 20px;
     background: var(--mobile-bg);
+    perspective: 1000px;
 }
 
 .skills-container {
@@ -2607,17 +2719,19 @@ body.mobile-app-open {
     gap: 32px;
     max-width: 500px;
     margin: 0 auto;
+    transform-style: preserve-3d;
 }
 
 .skill-category-3d {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
+    transform: translateY(30px) rotateX(10deg);
+    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
 }
 
 .section-visible .skill-category-3d {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) rotateX(0deg);
 }
 
 .section-visible .skill-category-3d:nth-child(1) { transition-delay: 0.1s; }
@@ -2633,49 +2747,57 @@ body.mobile-app-open {
     text-transform: uppercase;
     letter-spacing: 1px;
     margin: 0 0 16px 0;
+    transform: translateZ(5px);
 }
 
 .skill-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 12px;
+    transform-style: preserve-3d;
 }
 
 .skill-badge-3d {
     display: inline-block;
-    padding: 10px 18px;
-    background: var(--mobile-card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.9) 0%, rgba(20, 20, 20, 0.9) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--mobile-text);
     box-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.1),
-        0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    animation: float-in 0.5s ease backwards;
+        0 4px 8px rgba(0, 0, 0, 0.2),
+        0 8px 16px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateZ(0) rotateX(0deg);
+    animation: skill-float-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
 .section-visible .skill-badge-3d {
     animation-play-state: running;
 }
 
-@keyframes float-in {
+@keyframes skill-float-in {
     from {
         opacity: 0;
-        transform: translateY(10px) scale(0.95);
+        transform: translateY(20px) translateZ(-30px) rotateX(20deg);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0) translateZ(0) rotateX(0deg);
     }
 }
 
 .skill-badge-3d:active {
-    transform: scale(0.95);
-    background: rgba(59, 130, 246, 0.1);
+    transform: translateZ(20px) scale(1.05);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.1) 100%);
     border-color: var(--mobile-accent);
+    box-shadow:
+        0 10px 20px rgba(59, 130, 246, 0.2),
+        0 15px 30px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 /* ============================================
@@ -2684,6 +2806,7 @@ body.mobile-app-open {
 .mobile-contact-3d {
     padding: 80px 20px;
     background: var(--mobile-bg-secondary);
+    perspective: 1000px;
 }
 
 .contact-text-3d {
@@ -2703,6 +2826,7 @@ body.mobile-app-open {
     gap: 16px;
     max-width: 320px;
     margin: 0 auto;
+    transform-style: preserve-3d;
 }
 
 .contact-link-3d {
@@ -2710,21 +2834,31 @@ body.mobile-app-open {
     align-items: center;
     gap: 16px;
     padding: 18px 24px;
-    background: var(--mobile-card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
     text-decoration: none;
     color: var(--mobile-text);
     box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.1),
-        0 8px 16px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        0 5px 15px rgba(0, 0, 0, 0.2),
+        0 10px 30px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateZ(0) rotateX(0deg);
+}
+
+.section-visible .contact-link-3d {
+    transform: translateZ(15px) rotateX(2deg);
 }
 
 .contact-link-3d:active {
-    transform: scale(0.98);
-    background: rgba(59, 130, 246, 0.05);
-    border-color: rgba(59, 130, 246, 0.2);
+    transform: translateZ(30px) rotateX(0deg) scale(0.98) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow:
+        0 15px 30px rgba(59, 130, 246, 0.2),
+        0 20px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .contact-icon {
@@ -2732,6 +2866,7 @@ body.mobile-app-open {
     height: 24px;
     filter: brightness(0) invert(1);
     opacity: 0.9;
+    transform: translateZ(5px);
 }
 
 .contact-name {
