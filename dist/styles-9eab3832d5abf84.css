@@ -2270,8 +2270,21 @@ body.mobile-app-open {
     #menu-bar,
     #desktop,
     #dock,
-    .notification-center {
+    #notification-center {
         display: none !important;
+    }
+
+    /* Enable scrolling on mobile */
+    body {
+        overflow: auto !important;
+        overflow-x: hidden !important;
+        position: static !important;
+        height: auto !important;
+    }
+
+    html {
+        overflow: auto !important;
+        scroll-behavior: smooth;
     }
 
     /* Show mobile portfolio */
@@ -2283,10 +2296,6 @@ body.mobile-app-open {
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
         overflow-x: hidden;
         perspective: 1000px;
-    }
-
-    html {
-        scroll-behavior: smooth;
     }
 }
 
