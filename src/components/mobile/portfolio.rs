@@ -266,7 +266,7 @@ pub fn MobilePortfolio() -> impl IntoView {
             <ContactSection />
 
             <footer class="mobile-footer-3d">
-                <p>"© 2024 Rani Malach"</p>
+                <p>"© 2025 Rani Malach"</p>
                 <p class="footer-tech">"Built with Rust & Leptos"</p>
             </footer>
         </div>
