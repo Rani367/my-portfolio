@@ -23,6 +23,7 @@ This is a macOS replica portfolio website built with **Rust and Leptos**, compil
 - **Spotlight Search**: Search apps and locations via menu bar icon
 - **Startup Screen**: Apple-style boot animation (auto-enabled in release builds, disabled in debug)
 - **Notifications**: Toast notifications with auto-dismiss
+- **iOS Mobile Mode**: Automatic transformation to iOS-style interface on mobile devices (<768px)
 
 ### Key Directories
 
@@ -42,7 +43,8 @@ src/
 │   ├── window_state.rs # WindowId enum, window configurations
 │   ├── navigation_state.rs # Finder navigation
 │   └── notification_state.rs # Notification system
-├── hooks/              # Custom hooks (dragging, keyboard, clock, battery, animation)
+├── hooks/              # Custom hooks (keyboard, clock, battery, network, mobile)
+│   └── use_mobile.rs   # Device detection and mobile mode
 └── components/         # UI components
     ├── windows/        # Window component + content components
     │   ├── window.rs   # Base Window component
@@ -55,6 +57,10 @@ src/
     │   ├── resume.rs   # PDF viewer
     │   ├── txtfile.rs  # Text file viewer
     │   └── imgfile.rs  # Image file viewer
+    ├── mobile/         # iOS-style mobile components
+    │   ├── home_screen.rs   # iOS app grid
+    │   ├── app_container.rs # Full-screen app with swipe-to-close
+    │   └── status_bar.rs    # iOS status bar
     ├── menu_bar/       # Top menu bar
     ├── dock/           # Bottom dock
     ├── spotlight/      # Spotlight search overlay
@@ -67,6 +73,27 @@ src/
 - **RwSignal-based**: All reactive state uses `RwSignal<T>` for read/write access
 - **Window management**: `AppState.windows` is a `HashMap<WindowId, WindowState>` - all windows pre-registered, open/close toggles visibility
 - **Z-index management**: `AppState.next_z_index()` ensures focused window is always on top
+- **Mobile mode**: `AppState.is_mobile` signal tracks device type, `mobile_active_app` tracks the currently open mobile app
+
+### Mobile Mode (iOS Style)
+The site automatically transforms into an iOS-like interface on mobile devices (viewport < 768px):
+
+**Behavior:**
+- Desktop elements (menu bar, dock, windows) are hidden via CSS
+- iOS-style home screen displays with app grid (4 columns, 3 on very small phones)
+- Tapping an app opens it full-screen with slide-up animation
+- Swipe down or tap "Home" to close and return to home screen
+- Status bar shows time, network status, and battery
+
+**Key Components:**
+- `use_mobile_detection()` hook monitors viewport width and sets `AppState.is_mobile`
+- `MobileHomeScreen` renders the app grid and dock bar
+- `MobileAppContainer` wraps each app with header, swipe gesture handling, and animations
+
+**CSS Breakpoints:**
+- Desktop: >= 768px
+- Tablet: 640px - 767px
+- Phone: < 640px
 
 ### Virtual File System
 - Static data in `src/data/locations.rs` defines `LOCATIONS` array with nested `FileItem` children
@@ -124,11 +151,60 @@ Output in `dist/` directory.
 1. Add `FileItem` entry to appropriate location in `src/data/locations.rs`
 2. For new file types, ensure corresponding viewer window exists
 
+## Performance Patterns
+
+### Signal Access - Use `.with()` Over `.get()`
+When reading from signals inside memos without needing ownership, use `.with()` to avoid cloning:
+```rust
+// BAD: Clones the entire HashMap
+let is_open = Memo::new(move |_| {
+    app_state.windows.get().get(&window_id).map(|w| w.is_open).unwrap_or(false)
+});
+
+// GOOD: Borrows without cloning
+let is_open = Memo::new(move |_| {
+    app_state.windows.with(|windows| {
+        windows.get(&window_id).map(|w| w.is_open).unwrap_or(false)
+    })
+});
+```
+
+### Animations - Bypass Leptos Reactivity
+For 60fps animations (like dock magnification), bypass Leptos signals entirely:
+- Use a single `requestAnimationFrame` loop instead of per-component Effects
+- Read signals with `.get_untracked()` to avoid triggering reactivity
+- Apply transforms directly via `el.style().set_property()`
+- Use lerping for smooth transitions: `current += (target - current) * LERP_FACTOR`
+
+See `src/components/dock/dock.rs` for the reference implementation.
+
+### Keyed Rendering with `<For>`
+For lists that may change, use `<For>` with proper keys instead of `.map().collect_view()`:
+```rust
+// GOOD: Only changed items re-render
+<For
+    each={move || items.get().iter().enumerate().map(|(i, item)| (i, item.id)).collect::<Vec<_>>()}
+    key={|(_, id)| *id}
+    children={move |(idx, _)| { ... }}
+/>
+```
+
+### Async Cleanup
+For notifications or timed operations, check if already dismissed before proceeding:
+```rust
+spawn_local(async move {
+    TimeoutFuture::new(5000).await;
+    if !is_hiding.get_untracked() {  // Guard against double-dismiss
+        // proceed with dismissal
+    }
+});
+```
+
 ## Constraints
 
 - **NEVER commit on behalf of the user** - Stage changes and build, but let the user commit themselves
 - Maintain macOS-like UX patterns (window management, dock behavior, finder navigation)
 - CSS class names must match `styles.css` exactly for styling to work
-- **Performance**: Use signals efficiently, avoid unnecessary re-renders
+- **Top-tier performance** - Always write performance-efficient code. Use signals efficiently, avoid unnecessary re-renders, minimize allocations, and follow the Performance Patterns documented above. Every line of code should be optimized for speed and memory usage.
 - Keep the same visual effects (liquid glass, 3D animations) via existing CSS
 - **NEVER ignore warnings** - Address all compiler warnings and deprecation notices immediately. Do not proceed with other work until warnings are resolved.

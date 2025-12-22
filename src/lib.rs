@@ -7,7 +7,13 @@ pub mod hooks;
 pub mod components;
 
 use state::{provide_app_state, provide_navigation_state, provide_notification_state, use_app_state, WindowId};
-use components::{Window, MenuBar, Dock, FinderContent, TxtFileContent, ImgFileContent, TerminalContent, ContactContent, PhotosContent, AboutContent, SafariContent, ResumeContent, Spotlight, StartupScreen, NotificationCenter};
+use hooks::use_mobile_detection;
+use components::{
+    Window, MenuBar, Dock, FinderContent, TxtFileContent, ImgFileContent,
+    TerminalContent, ContactContent, PhotosContent, AboutContent, SafariContent,
+    ResumeContent, Spotlight, StartupScreen, NotificationCenter,
+    MobileHomeScreen, MobileAppContainer,
+};
 
 #[component]
 fn App() -> impl IntoView {
@@ -18,12 +24,19 @@ fn App() -> impl IntoView {
 
     let app_state = use_app_state();
 
-    // Open Finder window on mount
+    // Initialize mobile detection - this will set app_state.is_mobile
+    let _device_type = use_mobile_detection();
+
+    // Open Finder window on mount (desktop mode will show it, mobile will hide via CSS)
     app_state.open_window(WindowId::Finder);
 
     view! {
         // Apple startup screen
         <StartupScreen />
+
+        // ========================================
+        // DESKTOP UI (hidden on mobile via CSS)
+        // ========================================
 
         // Menu bar at top
         <MenuBar />
@@ -154,7 +167,51 @@ fn App() -> impl IntoView {
         // Spotlight search overlay
         <Spotlight />
 
-        // Notification center
+        // ========================================
+        // MOBILE UI (iOS Mode)
+        // ========================================
+
+        // iOS-style home screen with app grid
+        <MobileHomeScreen />
+
+        // Mobile app containers (full-screen with swipe to close)
+        <MobileAppContainer id=WindowId::Finder title="Portfolio">
+            <FinderContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::Terminal title="Skills">
+            <TerminalContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::Contact title="Contact">
+            <ContactContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::Photos title="Gallery">
+            <PhotosContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::Safari title="Safari">
+            <SafariContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::Resume title="Resume">
+            <ResumeContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::About title="About">
+            <AboutContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::TxtFile title="TextEdit">
+            <TxtFileContent />
+        </MobileAppContainer>
+
+        <MobileAppContainer id=WindowId::ImgFile title="Preview">
+            <ImgFileContent />
+        </MobileAppContainer>
+
+        // Notification center (works on both mobile and desktop)
         <NotificationCenter />
     }
 }

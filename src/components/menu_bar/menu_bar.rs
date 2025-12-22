@@ -4,7 +4,7 @@
 //! It includes the Apple logo, app name, menus, status icons, and clock.
 
 use leptos::prelude::*;
-use crate::state::{use_app_state, WindowId};
+use crate::state::{use_app_state, use_notification_state, WindowId};
 use super::clock::Clock;
 use super::status_icons::StatusIcons;
 use super::dropdown::{Dropdown, DropdownItem, DropdownDivider, MenuAction};
@@ -60,10 +60,16 @@ fn handle_menu_action(action: MenuAction, app_state: &crate::state::AppState) {
             app_state.open_window(WindowId::About);
         }
         MenuAction::KeyboardShortcuts => {
-            // TODO: Show notification with shortcuts
+            let notifications = use_notification_state();
+            notifications.show(
+                "/public/images/finder.png",
+                "Help",
+                "Keyboard Shortcuts",
+                "⌘+Space: Spotlight\n⌘+N: New Window\n⌘+W: Close Window\n⌘+M: Minimize"
+            );
         }
         MenuAction::EasterEggs => {
-            // TODO: Show notification with easter egg hints
+            // Easter eggs removed
         }
         _ => {
             // Other actions are not implemented or disabled

@@ -6,6 +6,7 @@
 pub mod clock;
 pub mod status_icons;
 pub mod dropdown;
+#[allow(clippy::module_inception)]
 pub mod menu_bar;
 
 pub use clock::Clock;

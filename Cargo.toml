@@ -14,7 +14,7 @@ web-sys = { version = "0.3", features = [
     "Window", "Document", "Element", "HtmlElement",
     "HtmlInputElement", "HtmlCanvasElement", "CanvasRenderingContext2d",
     "MouseEvent", "KeyboardEvent", "DragEvent",
-    "CssStyleDeclaration", "DomRect", "Navigator",
+    "CssStyleDeclaration", "DomRect", "Navigator", "Clipboard",
     "console", "Storage", "Performance"
 ]}
 gloo = "0.11"

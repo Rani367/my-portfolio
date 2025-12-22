@@ -7,6 +7,7 @@ pub struct WindowState {
     pub z_index: i32,
     pub is_focused: bool,
     pub is_maximized: bool,
+    pub is_minimized: bool,
     pub is_minimizing: bool,
     pub is_closing: bool,
     pub position: (i32, i32),
@@ -20,6 +21,7 @@ impl Default for WindowState {
             z_index: 1000,
             is_focused: false,
             is_maximized: false,
+            is_minimized: false,
             is_minimizing: false,
             is_closing: false,
             position: (100, 100),
@@ -38,12 +40,13 @@ impl WindowState {
         }
     }
 
-    /// Open the window.
+    /// Open the window (or restore from minimized).
     pub fn open(&mut self, z_index: i32) {
         self.is_open = true;
         self.is_focused = true;
         self.is_closing = false;
         self.is_minimizing = false;
+        self.is_minimized = false;
         self.z_index = z_index;
     }
 
@@ -66,7 +69,7 @@ impl WindowState {
 
     /// Complete minimize after animation.
     pub fn minimize_complete(&mut self) {
-        self.is_open = false;
+        self.is_minimized = true;
         self.is_focused = false;
         self.is_minimizing = false;
     }

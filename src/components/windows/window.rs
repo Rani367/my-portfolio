@@ -45,73 +45,94 @@ pub fn Window(
     let (drag_offset_x, set_drag_offset_x) = signal(0);
     let (drag_offset_y, set_drag_offset_y) = signal(0);
 
-    // Window state from global state
-    let is_open = {
+    // Window state from global state - use .with() to avoid cloning HashMap
+    let is_open = Memo::new({
         let app_state = app_state.clone();
-        Memo::new(move |_| {
-            app_state.windows.get()
-                .get(&window_id)
-                .map(|w| w.is_open)
-                .unwrap_or(false)
-        })
-    };
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.is_open).unwrap_or(false)
+            })
+        }
+    });
 
-    let is_focused = {
+    let is_focused = Memo::new({
         let app_state = app_state.clone();
-        Memo::new(move |_| {
-            app_state.windows.get()
-                .get(&window_id)
-                .map(|w| w.is_focused)
-                .unwrap_or(false)
-        })
-    };
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.is_focused).unwrap_or(false)
+            })
+        }
+    });
 
-    let is_closing = {
+    let is_closing = Memo::new({
         let app_state = app_state.clone();
-        Memo::new(move |_| {
-            app_state.windows.get()
-                .get(&window_id)
-                .map(|w| w.is_closing)
-                .unwrap_or(false)
-        })
-    };
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.is_closing).unwrap_or(false)
+            })
+        }
+    });
 
-    let is_minimizing = {
+    let is_minimizing = Memo::new({
         let app_state = app_state.clone();
-        Memo::new(move |_| {
-            app_state.windows.get()
-                .get(&window_id)
-                .map(|w| w.is_minimizing)
-                .unwrap_or(false)
-        })
-    };
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.is_minimizing).unwrap_or(false)
+            })
+        }
+    });
 
-    let z_index = {
+    let is_minimized = Memo::new({
         let app_state = app_state.clone();
-        Memo::new(move |_| {
-            app_state.windows.get()
-                .get(&window_id)
-                .map(|w| w.z_index)
-                .unwrap_or(1000)
-        })
-    };
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.is_minimized).unwrap_or(false)
+            })
+        }
+    });
+
+    let is_maximized = Memo::new({
+        let app_state = app_state.clone();
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.is_maximized).unwrap_or(false)
+            })
+        }
+    });
+
+    let z_index = Memo::new({
+        let app_state = app_state.clone();
+        move |_| {
+            app_state.windows.with(|windows| {
+                windows.get(&window_id).map(|w| w.z_index).unwrap_or(1000)
+            })
+        }
+    });
 
     // Window style - always compute, only apply when active
     let window_style = Memo::new(move |_| {
-        format!(
-            "left: {}px; top: {}px; width: {}px; height: {}px; z-index: {};",
-            pos_x.get(),
-            pos_y.get(),
-            width,
-            height,
-            z_index.get()
-        )
+        if is_maximized.get() {
+            // Full screen minus menu bar (28px) and dock (80px)
+            format!(
+                "left: 0; top: 28px; width: 100%; height: calc(100% - 28px - 80px); z-index: {};",
+                z_index.get()
+            )
+        } else {
+            format!(
+                "left: {}px; top: {}px; width: {}px; height: {}px; z-index: {};",
+                pos_x.get(),
+                pos_y.get(),
+                width,
+                height,
+                z_index.get()
+            )
+        }
     });
 
     // Window class - build based on state
     let window_class = Memo::new(move |_| {
         let mut classes = vec!["window"];
-        if is_open.get() {
+        if is_open.get() && !is_minimized.get() {
             classes.push("active");
         }
         if is_focused.get() {
@@ -122,6 +143,12 @@ pub fn Window(
         }
         if is_minimizing.get() {
             classes.push("minimizing");
+        }
+        if is_minimized.get() {
+            classes.push("minimized");
+        }
+        if is_maximized.get() {
+            classes.push("maximized");
         }
         classes.join(" ")
     });
@@ -154,8 +181,16 @@ pub fn Window(
             move || {
                 app_state_complete.minimize_window_complete(window_id);
             },
-            std::time::Duration::from_millis(350),
+            std::time::Duration::from_millis(400),
         );
+    };
+
+    // Maximize handler
+    let app_state_maximize = app_state.clone();
+    let on_maximize = move |e: MouseEvent| {
+        e.prevent_default();
+        e.stop_propagation();
+        app_state_maximize.toggle_maximize(window_id);
     };
 
     // Focus handler - only focus, don't do anything else
@@ -228,9 +263,9 @@ pub fn Window(
         >
             <div class="window-header" on:mousedown=on_header_mousedown>
                 <div class="window-controls">
-                    <button class="control close" on:click=on_close></button>
-                    <button class="control minimize" on:click=on_minimize></button>
-                    <button class="control maximize"></button>
+                    <button class="control close" on:click=on_close aria-label="Close window"></button>
+                    <button class="control minimize" on:click=on_minimize aria-label="Minimize window"></button>
+                    <button class="control maximize" on:click=on_maximize aria-label="Maximize window"></button>
                 </div>
                 <div class="window-title">
                     {icon_view}

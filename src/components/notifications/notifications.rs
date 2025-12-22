@@ -21,14 +21,17 @@ fn NotificationItem(notification: Notification) -> impl IntoView {
         set_is_visible.set(true);
     });
 
-    // Auto-dismiss after 5 seconds
+    // Auto-dismiss after 5 seconds - checks if already hiding before proceeding
     {
         let notification_state = notification_state.clone();
         spawn_local(async move {
             TimeoutFuture::new(5000).await;
-            set_is_hiding.set(true);
-            TimeoutFuture::new(400).await;
-            notification_state.remove(id);
+            // Only proceed if not already dismissed by user click
+            if !is_hiding.get_untracked() {
+                set_is_hiding.set(true);
+                TimeoutFuture::new(400).await;
+                notification_state.remove(id);
+            }
         });
     }
 

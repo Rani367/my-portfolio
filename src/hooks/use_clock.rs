@@ -27,8 +27,10 @@ pub fn use_clock() -> RwSignal<String> {
             time.set(format_current_time());
         });
 
-        // Keep the interval alive by forgetting it
-        // It will be cleaned up when the component unmounts
+        // Note: .forget() keeps the interval alive. This is intentional because:
+        // 1. The menu bar clock is always visible and never unmounts
+        // 2. gloo_timers::Interval is not Send+Sync, so on_cleanup won't work
+        // 3. For singleton components like this, the "leak" is the expected behavior
         interval.forget();
     });
 
@@ -52,6 +54,7 @@ pub fn use_clock_with_seconds() -> RwSignal<String> {
             time.set(format_current_time_with_seconds());
         });
 
+        // Note: .forget() keeps the interval alive - see use_clock() for rationale
         interval.forget();
     });
 

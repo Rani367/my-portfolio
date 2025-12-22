@@ -28,6 +28,10 @@ pub struct AppState {
     pub txt_file_data: RwSignal<Option<FileViewerData>>,
     /// Data for the image file viewer.
     pub img_file_data: RwSignal<Option<FileViewerData>>,
+    /// Whether the app is in mobile mode.
+    pub is_mobile: RwSignal<bool>,
+    /// Currently active app in mobile mode (single app view).
+    pub mobile_active_app: RwSignal<Option<WindowId>>,
 }
 
 impl AppState {
@@ -46,6 +50,8 @@ impl AppState {
             konami_active: RwSignal::new(false),
             txt_file_data: RwSignal::new(None),
             img_file_data: RwSignal::new(None),
+            is_mobile: RwSignal::new(false),
+            mobile_active_app: RwSignal::new(None),
         }
     }
 
@@ -108,7 +114,7 @@ impl AppState {
         });
     }
 
-    /// Focus a window.
+    /// Focus a window (also restores from minimized state).
     pub fn focus_window(&self, id: WindowId) {
         let z = self.next_z_index();
         self.windows.update(|windows| {
@@ -116,8 +122,10 @@ impl AppState {
             for (_, state) in windows.iter_mut() {
                 state.unfocus();
             }
-            // Focus the target window
+            // Focus the target window and restore if minimized
             if let Some(state) = windows.get_mut(&id) {
+                state.is_minimized = false;
+                state.is_minimizing = false;
                 state.focus(z);
             }
         });
@@ -163,6 +171,20 @@ impl AppState {
     /// Toggle Konami code easter egg.
     pub fn toggle_konami(&self) {
         self.konami_active.update(|active| *active = !*active);
+    }
+
+    /// Open an app in mobile mode (single full-screen view).
+    pub fn mobile_open_app(&self, id: WindowId) {
+        self.mobile_active_app.set(Some(id));
+        self.open_window(id);
+    }
+
+    /// Close the current mobile app (return to home screen).
+    pub fn mobile_close_app(&self) {
+        if let Some(id) = self.mobile_active_app.get_untracked() {
+            self.close_window(id);
+        }
+        self.mobile_active_app.set(None);
     }
 
     /// Get app name for menu bar display.

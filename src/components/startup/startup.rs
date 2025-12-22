@@ -5,7 +5,7 @@ use leptos::task::spawn_local;
 use gloo_timers::future::TimeoutFuture;
 
 /// Automatically enabled in release builds, disabled in debug builds.
-const STARTUP_SCREEN_ENABLED: bool = true; // TODO: revert to !cfg!(debug_assertions)
+const STARTUP_SCREEN_ENABLED: bool = !cfg!(debug_assertions);
 
 /// The name to type out on startup.
 const NAME: &str = "Hi, I'm Rani";
@@ -42,7 +42,7 @@ fn human_typing_delay(char_index: usize, ch: char) -> u32 {
 pub fn StartupScreen() -> impl IntoView {
     // Skip rendering if disabled
     if !STARTUP_SCREEN_ENABLED {
-        return view! {}.into_any();
+        return ().into_any();
     }
     let (displayed_text, set_displayed_text) = signal(String::new());
     let (is_typing_done, set_is_typing_done) = signal(false);
@@ -80,7 +80,7 @@ pub fn StartupScreen() -> impl IntoView {
     view! {
         {move || {
             if is_removed.get() {
-                view! {}.into_any()
+                ().into_any()
             } else {
                 view! {
                     <div

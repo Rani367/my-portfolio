@@ -1,5 +1,6 @@
 //! Dock component with macOS-style magnification effect.
 
+#[allow(clippy::module_inception)]
 mod dock;
 mod dock_item;
 

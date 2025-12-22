@@ -300,34 +300,6 @@ const FOOD_DELIVERY_CHILDREN: &[FileItem] = &[
     ),
 ];
 
-const SECRET_FOLDER_CHILDREN: &[FileItem] = &[
-    FileItem::txt_file(
-        1,
-        "secrets.txt",
-        Some("top-5 left-10"),
-        &[
-            "🎉 Congratulations! You found the secret folder!",
-            "Here are some hidden features you might have missed:",
-            "• Try the Konami code: ↑↑↓↓←→←→BA",
-            "• Click the Apple logo for 'About This Mac'",
-            "• Double-click the Trash icon in the dock for a surprise",
-            "Thanks for exploring! This portfolio was crafted with attention to every detail.",
-        ],
-    ),
-    FileItem::txt_file(
-        2,
-        "thank-you.txt",
-        Some("top-20 right-20"),
-        &[
-            "Thank you for taking the time to explore this portfolio!",
-            "Every interaction, animation, and detail was carefully crafted to create an immersive experience.",
-            "If you made it this far, you clearly have an eye for detail too.",
-            "Let's connect! Check out the contact section to get in touch.",
-            "— Built with vanilla HTML, CSS, and JavaScript. No frameworks harmed in the making of this portfolio. 🌿",
-        ],
-    ),
-];
-
 // ============================================
 // Work Location Children
 // ============================================
@@ -353,13 +325,6 @@ const WORK_CHILDREN: &[FileItem] = &[
         "/public/images/folder.png",
         Some("top-10 left-80"),
         FOOD_DELIVERY_CHILDREN,
-    ),
-    FileItem::folder(
-        99,
-        ".secret",
-        "/public/images/folder.png",
-        Some("top-10 right-5"),
-        SECRET_FOLDER_CHILDREN,
     ),
 ];
 

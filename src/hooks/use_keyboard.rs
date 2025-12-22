@@ -50,12 +50,18 @@ pub fn use_keyboard() -> UseKeyboardReturn {
                     seq.remove(0);
                 }
 
+                // Debug: log the current sequence
+                #[cfg(debug_assertions)]
+                web_sys::console::log_1(&format!("Key sequence: {:?}", seq).into());
+
                 // Check for Konami code
                 if seq.len() == 10 {
                     let matches = seq.iter()
                         .zip(KONAMI_CODE.iter())
                         .all(|(a, b)| a == *b);
                     if matches {
+                        #[cfg(debug_assertions)]
+                        web_sys::console::log_1(&"Konami code activated!".into());
                         konami_activated.update(|v| *v = !*v);
                         seq.clear();
                     }

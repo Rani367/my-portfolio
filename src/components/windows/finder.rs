@@ -75,77 +75,92 @@ fn SidebarLocations() -> impl IntoView {
     }
 }
 
-/// File grid component.
+/// File grid component - uses For with indices for efficient keyed rendering.
 #[component]
 fn FileGrid(
     items: Memo<&'static [FileItem]>,
     app_state: crate::state::AppState,
     nav_state: crate::state::NavigationState,
 ) -> impl IntoView {
+    // Use indices and item IDs for keying - items are static so we can safely reference by index
     view! {
-        {move || {
-            items.get().iter().map(|item| {
-                let nav_state = nav_state.clone();
-                let app_state = app_state.clone();
-                let on_click = move |_| {
-                    match item.kind {
-                        ItemKind::Folder => {
-                            nav_state.navigate_into_folder(item.id);
-                        }
-                        ItemKind::File => {
-                            match item.file_type {
-                                Some(FileType::Txt) => {
-                                    app_state.open_txt_file(item);
-                                }
-                                Some(FileType::Img) => {
-                                    app_state.open_img_file(item);
-                                }
-                                Some(FileType::Url) | Some(FileType::Fig) => {
-                                    if let Some(href) = item.href {
-                                        if let Some(win) = window() {
-                                            let _ = win.open_with_url_and_target(href, "_blank");
-                                        }
-                                    }
-                                }
-                                Some(FileType::Pdf) => {
-                                    app_state.open_window(WindowId::Resume);
-                                }
-                                None => {}
+        <For
+            each={move || {
+                items.get().iter().enumerate().map(|(i, item)| (i, item.id)).collect::<Vec<_>>()
+            }}
+            key={|(_, id)| *id}
+            children={move |(idx, _id)| {
+                let items_slice = items.get();
+                let item = &items_slice[idx];
+                view! {
+                    <FileGridItem item=item app_state=app_state.clone() nav_state=nav_state.clone() />
+                }
+            }}
+        />
+    }
+}
+
+/// Individual file item - extracted to prevent closure recreation.
+#[component]
+fn FileGridItem(
+    item: &'static FileItem,
+    app_state: crate::state::AppState,
+    nav_state: crate::state::NavigationState,
+) -> impl IntoView {
+    let on_click = move |_| {
+        match item.kind {
+            ItemKind::Folder => {
+                nav_state.navigate_into_folder(item.id);
+            }
+            ItemKind::File => {
+                match item.file_type {
+                    Some(FileType::Txt) => {
+                        app_state.open_txt_file(item);
+                    }
+                    Some(FileType::Img) => {
+                        app_state.open_img_file(item);
+                    }
+                    Some(FileType::Url) | Some(FileType::Fig) => {
+                        if let Some(href) = item.href {
+                            if let Some(win) = window() {
+                                let _ = win.open_with_url_and_target(href, "_blank");
                             }
                         }
                     }
-                };
-
-                let item_style = item.position.map(|pos| {
-                    let mut style = String::new();
-                    for part in pos.split_whitespace() {
-                        let parts: Vec<&str> = part.split('-').collect();
-                        if parts.len() == 2 {
-                            let prop = parts[0];
-                            let val: i32 = parts[1].parse().unwrap_or(0);
-                            let px = val * 4;
-                            style.push_str(&format!("{}: {}px; ", prop, px));
-                        }
+                    Some(FileType::Pdf) => {
+                        app_state.open_window(WindowId::Resume);
                     }
-                    if !style.is_empty() {
-                        style.push_str("position: absolute;");
-                    }
-                    style
-                }).unwrap_or_default();
-
-                let class_name = "file-item";
-
-                view! {
-                    <div
-                        class=class_name
-                        style=item_style
-                        on:click=on_click
-                    >
-                        <img src=item.icon alt="" class="file-item-icon" />
-                        <span class="file-item-name">{item.name}</span>
-                    </div>
+                    None => {}
                 }
-            }).collect_view()
-        }}
+            }
+        }
+    };
+
+    let item_style = item.position.map(|pos| {
+        let mut style = String::new();
+        for part in pos.split_whitespace() {
+            let parts: Vec<&str> = part.split('-').collect();
+            if parts.len() == 2 {
+                let prop = parts[0];
+                let val: i32 = parts[1].parse().unwrap_or(0);
+                let px = val * 4;
+                style.push_str(&format!("{}: {}px; ", prop, px));
+            }
+        }
+        if !style.is_empty() {
+            style.push_str("position: absolute;");
+        }
+        style
+    }).unwrap_or_default();
+
+    view! {
+        <div
+            class="file-item"
+            style=item_style
+            on:click=on_click
+        >
+            <img src=item.icon alt="" class="file-item-icon" />
+            <span class="file-item-name">{item.name}</span>
+        </div>
     }
 }

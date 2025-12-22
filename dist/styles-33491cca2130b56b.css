@@ -74,6 +74,15 @@ body {
     perspective: var(--perspective);
 }
 
+/* Mobile scroll lock when app is open */
+body.mobile-app-open {
+    overflow: hidden !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+}
+
 /* ============================================
    3D TYPING STARTUP SCREEN
    ============================================ */
@@ -930,7 +939,12 @@ body {
 }
 
 .window.minimizing {
-    animation: windowMinimize3D 0.25s var(--ease-out-expo) forwards;
+    animation: genieMinimize 0.4s cubic-bezier(0.5, 0, 0.75, 0) forwards;
+    transform-origin: bottom center;
+}
+
+.window.minimized {
+    display: none;
 }
 
 .window.focused {
@@ -944,6 +958,16 @@ body {
 
 .window.shake {
     animation: windowShake 0.4s ease-in-out;
+}
+
+/* Window Maximize State */
+.window.maximized {
+    border-radius: 0 !important;
+    transition: all 0.3s var(--ease-out-expo);
+}
+
+.window.maximized .window-header {
+    border-radius: 0;
 }
 
 /* Window Animations - 3D Enhanced */
@@ -971,19 +995,15 @@ body {
     }
 }
 
-@keyframes windowMinimize3D {
-    0% {
+/* Genie minimize effect - smooth macOS-style animation */
+@keyframes genieMinimize {
+    from {
+        transform: translateY(0) scaleX(1) scaleY(1);
         opacity: 1;
-        transform: perspective(1000px) scale(1) translateY(0) rotateX(0deg);
     }
-    50% {
-        transform: perspective(1000px) scale(0.8) translateY(30vh)
-            rotateX(15deg);
-    }
-    100% {
+    to {
+        transform: translateY(calc(100vh - 90px)) scaleX(0.04) scaleY(0.15);
         opacity: 0;
-        transform: perspective(1000px) scale(0.3) translateY(70vh)
-            rotateX(30deg);
     }
 }
 
@@ -1003,40 +1023,6 @@ body {
     }
     80% {
         transform: translateX(4px) rotateY(1deg);
-    }
-}
-
-/* Legacy animations for compatibility */
-@keyframes windowOpen {
-    from {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-@keyframes windowClose {
-    from {
-        opacity: 1;
-        transform: scale(1);
-    }
-    to {
-        opacity: 0;
-        transform: scale(0.95);
-    }
-}
-
-@keyframes windowMinimize {
-    0% {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.4) translateY(60vh);
     }
 }
 
@@ -1349,114 +1335,173 @@ body {
 .safari-header .window-controls {
     position: absolute;
     left: 16px;
-    top: 14px;
+    top: 50%;
+    transform: translateY(-50%);
     z-index: 2;
 }
 
+/* Safari Toolbar - matches real Safari */
 .safari-toolbar {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px 10px 90px;
+    gap: 12px;
+    padding: 8px 12px 8px 80px;
     width: 100%;
-    background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
+    height: 52px;
+    background: linear-gradient(180deg,
+        rgba(60, 60, 67, 0.95) 0%,
+        rgba(50, 50, 55, 0.95) 100%
+    );
+    border-bottom: 1px solid rgba(0, 0, 0, 0.3);
 }
 
-.safari-nav-buttons {
-    display: flex;
-    gap: 4px;
-}
-
-.safari-nav-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    border: none;
-    background: transparent;
-    color: var(--text-secondary);
-    cursor: pointer;
+.safari-toolbar-left {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
-
-.safari-nav-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-}
-
-.safari-nav-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.safari-url-bar {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
-    padding: 6px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
-}
-
-.safari-url-bar:focus-within {
-    background: rgba(0, 0, 0, 0.4);
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
-}
-
-.safari-url-icon {
-    color: var(--accent-green);
+    gap: 6px;
     flex-shrink: 0;
 }
 
-#safari-url-input {
-    flex: 1;
-    background: none;
-    border: none;
-    outline: none;
-    color: var(--text-primary);
-    font-size: 13px;
-    font-family: inherit;
+.safari-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
 }
 
-#safari-url-input::placeholder {
-    color: var(--text-tertiary);
+.safari-nav-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
 }
 
-.safari-reload-btn {
-    width: 28px;
-    height: 28px;
+/* Safari buttons */
+.safari-btn {
+    width: 32px;
+    height: 32px;
     border-radius: 6px;
     border: none;
     background: transparent;
-    color: var(--text-secondary);
+    color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.15s ease;
+}
+
+.safari-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.safari-btn:active:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.safari-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+/* Safari Address Bar - centered pill style */
+.safari-address-bar {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 auto;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s ease;
+    overflow: hidden;
+}
+
+.safari-address-bar:hover {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.safari-address-bar.focused {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+}
+
+.safari-address-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    padding: 0 8px;
+    gap: 6px;
+}
+
+.safari-lock-icon {
+    flex-shrink: 0;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.safari-address-input {
+    flex: 1;
+    min-width: 0;
+    background: none;
+    border: none;
+    outline: none;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    text-align: center;
+    text-overflow: ellipsis;
+}
+
+.safari-address-bar.focused .safari-address-input {
+    text-align: left;
+}
+
+.safari-address-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.safari-address-input::selection {
+    background: rgba(0, 122, 255, 0.4);
+}
+
+/* Reload button inside address bar */
+.safari-reload-btn {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    padding: 0;
 }
 
 .safari-reload-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
+    color: rgba(255, 255, 255, 0.85);
 }
 
 .safari-body {
-    background: #fff;
+    flex-direction: column;
+    background: #1c1c1e;
     padding: 0;
     overflow: hidden;
 }
 
 .safari-iframe {
+    flex: 1;
     width: 100%;
-    height: 100%;
+    min-height: 0;
     border: none;
     background: #fff;
 }
@@ -2006,9 +2051,10 @@ body {
     cursor: pointer;
     position: relative;
     padding: 2px;
-    /* Transform handled by JS animation loop for smoothness */
+    /* Transform handled by JS RAF loop - no CSS transition */
     transform-style: preserve-3d;
     will-change: transform;
+    transform: translateZ(0); /* Force GPU compositing layer */
 }
 
 .dock-item:hover .dock-tooltip {
@@ -2138,163 +2184,6 @@ body {
     background: rgba(255, 255, 255, 0.25);
 }
 
-/* Easter egg styles */
-body.konami-active #desktop {
-    animation: rainbow 4s linear infinite;
-}
-
-body.konami-active .dock-icon {
-    animation: pulse 0.8s ease infinite;
-}
-
-@keyframes rainbow {
-    0% {
-        filter: hue-rotate(0deg);
-    }
-    100% {
-        filter: hue-rotate(360deg);
-    }
-}
-
-@keyframes pulse {
-    0%,
-    100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.08);
-    }
-}
-
-/* Speed Test Window */
-.speedtest-body {
-    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-}
-
-.speedtest-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 30px;
-    height: 100%;
-    color: #fff;
-    text-align: center;
-}
-
-.speedtest-header {
-    margin-bottom: 30px;
-}
-
-.speedtest-logo {
-    color: #00d4ff;
-    margin-bottom: 15px;
-}
-
-.speedtest-title {
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-    color: #fff;
-}
-
-.speedtest-status {
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.6);
-    margin: 0;
-}
-
-.speedtest-results {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-bottom: 30px;
-    width: 100%;
-    max-width: 350px;
-}
-
-.speedtest-metric {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.speedtest-metric.small {
-    padding: 15px;
-}
-
-.metric-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #00d4ff;
-    margin-bottom: 5px;
-}
-
-.speedtest-metric.small .metric-value {
-    font-size: 20px;
-}
-
-.metric-label {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.speedtest-progress {
-    width: 100%;
-    max-width: 350px;
-    margin-bottom: 20px;
-}
-
-.progress-bar {
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #00d4ff, #00ff88);
-    border-radius: 2px;
-    transition: width 0.3s ease;
-}
-
-.speedtest-button {
-    background: linear-gradient(135deg, #00d4ff, #00a8cc);
-    color: #fff;
-    border: none;
-    padding: 14px 40px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-}
-
-.speedtest-button:hover:not(:disabled) {
-    transform: scale(1.05);
-    box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
-}
-
-.speedtest-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.speedtest-info {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
-    max-width: 300px;
-}
-
-.speedtest-info p {
-    margin: 4px 0;
-}
-
 /* Status tooltip additions */
 .status-divider {
     height: 1px;
@@ -2352,4 +2241,497 @@ body.konami-active .dock-icon {
     #spotlight {
         width: 95vw;
     }
+}
+
+/* ============================================
+   MOBILE STYLES - iOS MODE
+   ============================================ */
+
+:root {
+    /* Mobile breakpoints */
+    --breakpoint-phone: 640px;
+    --breakpoint-tablet: 768px;
+
+    /* Mobile sizing */
+    --mobile-status-bar-height: 54px;
+    --mobile-home-indicator-height: 34px;
+    --mobile-app-icon-size: 60px;
+    --mobile-touch-target: 44px;
+
+    /* Mobile safe areas */
+    --safe-area-top: env(safe-area-inset-top, 0px);
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-left: env(safe-area-inset-left, 0px);
+    --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+/* Hide desktop elements on mobile */
+@media (max-width: 767px) {
+    #menu-bar,
+    #dock,
+    #windows-container,
+    #spotlight-overlay {
+        display: none !important;
+    }
+}
+
+/* ============================================
+   MOBILE HOME SCREEN
+   ============================================ */
+
+.mobile-home-screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    flex-direction: column;
+    z-index: 9000;
+    padding-top: var(--safe-area-top);
+    padding-left: var(--safe-area-left);
+    padding-right: var(--safe-area-right);
+}
+
+/* Ensure mobile home screen is hidden on desktop */
+@media (min-width: 768px) {
+    .mobile-home-screen,
+    .mobile-home-screen.visible {
+        display: none !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .mobile-home-screen.visible {
+        display: flex;
+    }
+}
+
+/* ============================================
+   MOBILE STATUS BAR
+   ============================================ */
+
+.mobile-status-bar {
+    height: var(--mobile-status-bar-height);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.mobile-status-left,
+.mobile-status-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 80px;
+}
+
+.mobile-status-right {
+    justify-content: flex-end;
+}
+
+.mobile-status-notch {
+    width: 126px;
+    height: 37px;
+    background: #000;
+    border-radius: 20px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 400px) {
+    .mobile-status-notch {
+        width: 100px;
+        height: 30px;
+    }
+}
+
+.mobile-time {
+    font-weight: 600;
+    letter-spacing: -0.3px;
+}
+
+.mobile-signal,
+.mobile-wifi,
+.mobile-battery {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.mobile-wifi-icon {
+    width: 16px;
+    height: 16px;
+}
+
+/* ============================================
+   MOBILE APP GRID
+   ============================================ */
+
+.mobile-app-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px 16px;
+    padding: 24px 24px 16px;
+    align-content: start;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 380px) {
+    .mobile-app-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px 12px;
+        padding: 20px 16px 12px;
+    }
+}
+
+/* ============================================
+   MOBILE APP ICON
+   ============================================ */
+
+.mobile-app-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    padding: 0;
+}
+
+.mobile-app-icon-wrapper {
+    width: var(--mobile-app-icon-size);
+    height: var(--mobile-app-icon-size);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: transform 0.15s ease;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.mobile-app-icon-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mobile-app-icon:active .mobile-app-icon-wrapper {
+    transform: scale(0.88);
+}
+
+.mobile-app-label {
+    font-size: 11px;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 74px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: -0.2px;
+}
+
+/* ============================================
+   MOBILE DOCK BAR
+   ============================================ */
+
+.mobile-dock-bar {
+    height: calc(90px + var(--mobile-home-indicator-height));
+    padding: 8px 20px;
+    padding-bottom: calc(8px + var(--safe-area-bottom));
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-shrink: 0;
+}
+
+.mobile-dock-bar-inner {
+    display: flex;
+    gap: 16px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mobile-dock-bar .mobile-app-icon {
+    gap: 0;
+}
+
+.mobile-dock-bar .mobile-app-icon-wrapper {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+}
+
+.mobile-dock-bar .mobile-app-label {
+    display: none;
+}
+
+/* ============================================
+   MOBILE HOME INDICATOR
+   ============================================ */
+
+.mobile-home-indicator {
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 3px;
+}
+
+@media (min-width: 768px) {
+    .mobile-home-indicator {
+        display: none;
+    }
+}
+
+/* ============================================
+   MOBILE APP CONTAINER
+   ============================================ */
+
+.mobile-app-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-window);
+    z-index: 10000;
+    display: none;
+    flex-direction: column;
+    will-change: transform, opacity;
+    overflow: hidden;
+}
+
+/* Only show mobile app containers on mobile devices */
+@media (max-width: 767px) {
+    .mobile-app-container.active {
+        display: flex;
+        animation: mobileAppOpen 0.35s var(--ease-out-expo) forwards;
+    }
+
+    .mobile-app-container.closing {
+        animation: mobileAppClose 0.25s ease-out forwards;
+    }
+}
+
+@keyframes mobileAppOpen {
+    from {
+        transform: scale(0.92) translateY(60px);
+        opacity: 0;
+        border-radius: 40px;
+    }
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        border-radius: 0;
+    }
+}
+
+@keyframes mobileAppClose {
+    from {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        border-radius: 0;
+    }
+    to {
+        transform: scale(0.92) translateY(100vh);
+        opacity: 0;
+        border-radius: 40px;
+    }
+}
+
+/* ============================================
+   MOBILE APP HEADER
+   ============================================ */
+
+.mobile-app-header {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    padding-top: var(--safe-area-top);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.mobile-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--accent-blue);
+    font-size: 17px;
+    font-weight: 400;
+    padding: 8px 0;
+    min-height: var(--mobile-touch-target);
+    min-width: var(--mobile-touch-target);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-back-btn:active {
+    opacity: 0.6;
+}
+
+.mobile-back-icon {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2.5;
+}
+
+.mobile-app-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+}
+
+.mobile-header-spacer {
+    min-width: var(--mobile-touch-target);
+}
+
+/* ============================================
+   MOBILE APP CONTENT
+   ============================================ */
+
+.mobile-app-content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(var(--mobile-home-indicator-height) + var(--safe-area-bottom));
+}
+
+/* Adjust content within mobile app containers */
+.mobile-app-content .finder-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-app-content .finder-sidebar {
+    display: none;
+}
+
+.mobile-app-content .finder-content {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.mobile-app-content .finder-content.files-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-content: start;
+}
+
+@media (max-width: 380px) {
+    .mobile-app-content .finder-content.files-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.mobile-app-content .file-item {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    width: 100% !important;
+}
+
+/* Terminal adjustments */
+.mobile-app-content .terminal-container {
+    height: 100%;
+}
+
+.mobile-app-content .terminal-body {
+    font-size: 13px;
+    padding: 16px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Contact adjustments */
+.mobile-app-content .socials-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 16px;
+}
+
+/* Photos adjustments */
+.mobile-app-content .photos-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-app-content .photos-sidebar {
+    display: none;
+}
+
+.mobile-app-content .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 12px;
+}
+
+/* Safari adjustments */
+.mobile-app-content .safari-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-app-content .safari-toolbar {
+    padding: 8px 12px;
+    flex-shrink: 0;
+}
+
+.mobile-app-content .safari-toolbar-left,
+.mobile-app-content .safari-toolbar-right {
+    display: none;
+}
+
+.mobile-app-content .safari-address-bar {
+    flex: 1;
+    max-width: 100%;
+}
+
+.mobile-app-content .safari-content {
+    flex: 1;
+}
+
+/* Resume viewer adjustments */
+.mobile-app-content .resume-container {
+    height: 100%;
+}
+
+.mobile-app-content .resume-toolbar {
+    padding: 8px 12px;
+}
+
+/* About window adjustments */
+.mobile-app-content .about-container {
+    padding: 24px 16px;
 }

@@ -180,6 +180,8 @@ pub fn Spotlight() -> impl IntoView {
                         id="spotlight-input"
                         placeholder="Spotlight Search"
                         autocomplete="off"
+                        role="searchbox"
+                        aria-label="Search applications and folders"
                         prop:value=move || query.get()
                         on:input=on_input
                         on:keydown=on_keydown
@@ -191,7 +193,7 @@ pub fn Spotlight() -> impl IntoView {
                         let selected = selected_index.get();
 
                         if results_vec.is_empty() {
-                            view! {}.into_any()
+                            ().into_any()
                         } else {
                             // Group by type
                             let apps: Vec<_> = results_vec.iter()
