@@ -1107,8 +1107,10 @@ body.mobile-app-open {
     font-size: 11px;
     font-weight: 700;
     color: rgba(0, 0, 0, 0.6);
-    line-height: 1;
-    margin-top: -2px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .window.focused .window-controls:hover .control.minimize::before {
@@ -1116,8 +1118,10 @@ body.mobile-app-open {
     font-size: 14px;
     font-weight: 700;
     color: rgba(0, 0, 0, 0.6);
-    line-height: 1;
-    margin-top: -2px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .window.focused .window-controls:hover .control.maximize::before {
@@ -1125,8 +1129,10 @@ body.mobile-app-open {
     font-size: 11px;
     font-weight: 700;
     color: rgba(0, 0, 0, 0.6);
-    line-height: 1;
-    margin-top: -2px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .window-title {
