@@ -1,45 +1,44 @@
 "use client";
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import ContactForm from "../ContactForm";
 import { config } from "@/data/config";
 import { SectionHeader } from "./section-header";
 import SectionWrapper from "../ui/section-wrapper";
+import { Button } from "../ui/button";
+import Link from "next/link";
+import { SiGithub } from "react-icons/si";
+import { Mail } from "lucide-react";
 
 const ContactSection = () => {
   return (
-    <SectionWrapper id="contact" className="min-h-screen max-w-7xl mx-auto ">
-      <SectionHeader id='contact' className="relative mb-14" title={
-        <>
-          LET&apos;S WORK <br />
-          TOGETHER
-        </>} />
-      <div className="grid grid-cols-1 md:grid-cols-2 z-[9999] mx-4">
-        <Card className="min-w-7xl bg-white/70 dark:bg-black/70 backdrop-blur-sm rounded-xl mt-10 md:mt-20">
-          <CardHeader>
-            <CardTitle className="text-4xl">Contact Form</CardTitle>
-            <CardDescription>
-              Please contact me directly at{" "}
-              <a
-                target="_blank"
-                href={`mailto:${config.email}`}
-                className="text-gray-200 cursor-can-hover rounded-lg"
-              >
-                {config.email.replace(/@/g, "(at)")}
-              </a>{" "}
-              or drop your info here.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ContactForm />
-          </CardContent>
-        </Card>
+    <SectionWrapper id="contact" className="min-h-screen max-w-7xl mx-auto">
+      <SectionHeader
+        id="contact"
+        className="relative mb-14"
+        title={
+          <>
+            GET IN <br />
+            TOUCH
+          </>
+        }
+      />
+      <div className="flex flex-col items-center gap-6 mx-4 mt-10 md:mt-20">
+        <p className="text-center text-lg text-muted-foreground max-w-md">
+          Want to chat? Feel free to reach out via email or check out my GitHub!
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <Link href={`mailto:${config.email}`}>
+            <Button size="lg" className="gap-2">
+              <Mail size={20} />
+              {config.email}
+            </Button>
+          </Link>
+          <Link href={config.social.github} target="_blank">
+            <Button size="lg" variant="outline" className="gap-2">
+              <SiGithub size={20} />
+              GitHub
+            </Button>
+          </Link>
+        </div>
       </div>
     </SectionWrapper>
   );
