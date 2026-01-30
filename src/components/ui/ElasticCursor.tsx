@@ -191,6 +191,21 @@ function ElasticCursor() {
   }, [loadingPercent]);
 
   useTicker(loop, isLoading || !cursorMoved || isMobile);
+
+  // Toggle custom cursor class on body to hide default cursor
+  useEffect(() => {
+    if (isMobile || isBlogPost) {
+      document.body.classList.remove("custom-cursor-active");
+      return;
+    }
+
+    document.body.classList.add("custom-cursor-active");
+
+    return () => {
+      document.body.classList.remove("custom-cursor-active");
+    };
+  }, [isMobile, isBlogPost]);
+
   if (isMobile || isBlogPost) return null;
 
   // Return UI

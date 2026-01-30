@@ -11,7 +11,7 @@ import { usePreloader } from "./preloader";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { Section, getKeyboardState } from "./animated-background-config";
-import { useSounds } from "./realtime/hooks/use-sounds";
+import { useSounds } from "@/hooks/use-sounds";
 
 gsap.registerPlugin(ScrollTrigger);
 

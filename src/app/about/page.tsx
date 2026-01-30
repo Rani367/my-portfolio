@@ -9,10 +9,8 @@ import {
   FaGit,
   FaGithub,
   FaHtml5,
-  FaLinkedin,
   FaLinux,
   FaNodeJs,
-  FaPhone,
   FaReact,
   FaVuejs,
   FaYarn,
@@ -43,26 +41,14 @@ import { TbTerminal2 } from "react-icons/tb";
 const CONTACT_LINKS = [
   {
     name: "Email",
-    content: "naresh.khatri2345@gmail",
-    href: "mailto:naresh.khatri2345@gmail.com",
+    content: "rani2011367@gmail.com",
+    href: "mailto:rani2011367@gmail.com",
     icon: <FaEnvelope height={"50px"} />,
   },
   {
-    name: "Phone",
-    content: "1234567890",
-    href: "tel:1234567890",
-    icon: <FaPhone height={"50px"} />,
-  },
-  {
-    name: "LinkedIn",
-    href: "https://www.linkedin.com/in/naresh-khatri/",
-    content: "/naresh-khatri",
-    icon: <FaLinkedin height={"50px"} />,
-  },
-  {
     name: "GitHub",
-    href: "https://github.com/Naresh-Khatri",
-    content: "/naresh-khatri",
+    href: "https://github.com/Rani367",
+    content: "/Rani367",
     icon: <FaGithub height={"50px"} />,
   },
 ];
@@ -243,17 +229,10 @@ function Page() {
             }}
           >
             <div className="flex flex-row lg:flex-col items-center">
-              <div className="flex justify-center items-center lg:w-full lg:aspect-square bg-zinc-800 rounded-xl lg:mb-5">
-                <img
-                  className="rounded-full p-4 lg:p-10 w-[100px] md:w-[150px] lg:w-[200px] aspect-square  bg-zinc-800"
-                  alt="me"
-                  src="/assets/me.jpg"
-                />
-              </div>
-              <div className="flex flex-col gap-3 lg:items-center ml-10 md:ml-20 lg:ml-0">
-                <p className="text-center text-xl">Naresh Khatri</p>
+              <div className="flex flex-col gap-3 lg:items-center">
+                <p className="text-center text-xl">Rani</p>
                 <div className="text-xs bg-zinc-700 w-fit px-3 py-1 rounded-full">
-                  Web Developer
+                  Student & Developer
                 </div>
               </div>
             </div>
@@ -287,16 +266,16 @@ function Page() {
           >
             <h1 className="text-3xl mb-10 lg:md-20">About me</h1>
             <p className="mb-10 text-roboto">
-              Hey there! I&apos;m Naresh, a Fullstack developer passionate about
-              creating meaningful digital experiences. With great in Web
-              development, I thrive on turning ideas into reality through coding
-              and design. My journey began with a fascination for technology and
-              a drive to make a positive impact.
+              Hey! I&apos;m Rani, a high school student with a passion for coding.
+              I&apos;m self-teaching web development with Next.js and React while
+              learning Python, C, and C# at school. I love building real projects
+              and contributing to open source - I even got a PR merged into Zed editor!
             </p>
             <p className="mb-10">
-              When I&apos;m not coding, you can find me [Your
-              Interests/Hobbies], exploring new technologies, or sipping coffee
-              while brainstorming my next project.
+              When I&apos;m not coding, you can find me tweaking my Neovim config,
+              exploring new technologies, or working on my next side project.
+              I built Hativon, my school&apos;s newspaper website, and I&apos;m always
+              looking for new challenges to learn from.
             </p>
             <h1 className="text-3xl mb-10 lg:md-20">Stuff I use</h1>
             <div className="mb-5">
